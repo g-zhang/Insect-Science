@@ -12,8 +12,6 @@ public class InGameUI : MonoBehaviour {
 	public void Awake() {
 		S = this;
 
-		Main.S.GetComponent<Main>();
-
 		healthAmount = transform.Find("HealthAmount").GetComponent<Text>();
 		flyAmount = transform.Find("FlyAmount").GetComponent<Text>();
 		carbonAmount = transform.Find("CarbonAmount").GetComponent<Text>();
