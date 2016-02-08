@@ -51,10 +51,16 @@ public class Main : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
 	    // Player wants to switch control between scientist and swarm
         if (Input.GetKeyDown(KeyCode.Q)) {
-            // Switch control between the scientist and the swarm
+            // Update swarm state (if swarm is not attacking)
+            if (Swarm.S.state != SwarmState.Attack) {
+                Swarm.S.state = (controlScientist) ? SwarmState.Move : SwarmState.Follow;
+                Swarm.S.rigid.velocity = Vector3.zero;
+            }
             controlScientist = !controlScientist;
         }
+
 	}
 }
