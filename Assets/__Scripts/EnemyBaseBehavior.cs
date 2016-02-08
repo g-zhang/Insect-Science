@@ -22,9 +22,11 @@ public class EnemyBaseBehavior : MonoBehaviour {
     public float currWaitTime = 0f;
 
     NavMeshAgent navagn;
-    Rigidbody body;
+    protected Rigidbody body;
     Vector3 nextPoint;
     float nextWaitTime = 0f;
+    protected Vector3 visionVector = Vector3.zero;
+    protected Vector3 visionPos = Vector3.zero;
 
 	// Use this for initialization
 	void Start () {
@@ -42,7 +44,8 @@ public class EnemyBaseBehavior : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        Debug.DrawRay(body.transform.position, body.transform.forward * 3f, Color.red);
+        getVisionVals();
+        Debug.DrawRay(visionPos, visionVector.normalized * sightRange, Color.red);
         BaseClassUpdate();
 
         Debug.DrawRay(Swarm.S.transform.position, Vector3.up * 3f, Color.green);
@@ -73,17 +76,17 @@ public class EnemyBaseBehavior : MonoBehaviour {
     //returns true if scientist is in range
     public bool SwarmInRange(float range)
     {
-        return (Vector3.Distance(Swarm.S.transform.position, body.transform.position) <= range);
+        return (Vector3.Distance(Swarm.S.transform.position, visionPos) <= range);
     }
 
     public bool SwarmInSight(float range, float visionAngle)
     {
-        Vector3 targetDir = Swarm.S.transform.position - body.transform.position;
+        Vector3 targetDir = Swarm.S.transform.position - visionPos;
         Vector3 targetDirX = new Vector3(targetDir.x, 0, 0);
         //Debug.DrawRay(body.transform.position, targetDir, Color.blue);
         //Debug.DrawRay(body.transform.position, targetDirX, Color.cyan);
-        return SwarmInRange(range) && (Vector3.Angle(targetDir, body.transform.forward) <= visionAngle)
-                                   && (Vector3.Angle(targetDirX, body.transform.forward) <= 5f);
+        return SwarmInRange(range) && (Vector3.Angle(targetDir, visionVector) <= visionAngle)
+                                   && (Vector3.Angle(targetDirX, visionVector) <= 5f);
     }
 
 
@@ -116,15 +119,19 @@ public class EnemyBaseBehavior : MonoBehaviour {
     {
         if(currWaitTime > 0)
         {
-            //navagn.enabled = false;
+            navagn.updateRotation = false;
             navagn.Stop();
+            
+            //navagn.enabled = false;
+
             currWaitTime -= Time.deltaTime;
         }
         else
         {
             navagn.Resume();
-            navagn.enabled = true;
-            if(ArrivedAt(nextPoint))
+            navagn.updateRotation = true;
+            //navagn.enabled = true;
+            if (ArrivedAt(nextPoint))
             {
                 currWaitTime = nextWaitTime;
                 patrolIndex = (patrolIndex + 1) % patrolPath.Length;
@@ -160,4 +167,10 @@ public class EnemyBaseBehavior : MonoBehaviour {
     }
 
 
+    //function return the vector of the enemies line of sight
+    public virtual void getVisionVals()
+    {
+        visionVector = body.transform.forward;
+        visionPos = body.transform.position;
+    }
 }
