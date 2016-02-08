@@ -46,10 +46,6 @@ public class EnemyBaseBehavior : MonoBehaviour {
         BaseClassUpdate();
 
         Debug.DrawRay(Swarm.S.transform.position, Vector3.up * 3f, Color.green);
-        if (SwarmInSight(sightRange, sightAngle))
-        {
-            currState = EnemyState.attacking;
-        }
 
         if(currState == EnemyState.normal)
         {
@@ -63,7 +59,8 @@ public class EnemyBaseBehavior : MonoBehaviour {
             }
         } else if(currState == EnemyState.attacking)
         {
-            navagn.enabled = false;
+            //navagn.enabled = false;
+            navagn.Stop();
             Attack();
             if (!SwarmInSight(sightRange, sightAngle))
             {
@@ -82,7 +79,11 @@ public class EnemyBaseBehavior : MonoBehaviour {
     public bool SwarmInSight(float range, float visionAngle)
     {
         Vector3 targetDir = Swarm.S.transform.position - body.transform.position;
-        return SwarmInRange(range) && (Vector3.Angle(targetDir, body.transform.forward) <= visionAngle);
+        Vector3 targetDirX = new Vector3(targetDir.x, 0, 0);
+        //Debug.DrawRay(body.transform.position, targetDir, Color.blue);
+        //Debug.DrawRay(body.transform.position, targetDirX, Color.cyan);
+        return SwarmInRange(range) && (Vector3.Angle(targetDir, body.transform.forward) <= visionAngle)
+                                   && (Vector3.Angle(targetDirX, body.transform.forward) <= 5f);
     }
 
 
@@ -115,11 +116,13 @@ public class EnemyBaseBehavior : MonoBehaviour {
     {
         if(currWaitTime > 0)
         {
-            navagn.enabled = false;
+            //navagn.enabled = false;
+            navagn.Stop();
             currWaitTime -= Time.deltaTime;
         }
         else
         {
+            navagn.Resume();
             navagn.enabled = true;
             if(ArrivedAt(nextPoint))
             {
