@@ -21,8 +21,8 @@ public class Persistent : MonoBehaviour {
 		}
 	}
 
-	public int carbon = 0;		// Amount of carbon we have.
-	public int lithium = 0;     // Amount of lithium we have.
+	public int carbon = 100;		// Amount of carbon we have.
+	public int lithium = 50;     // Amount of lithium we have.
 
 	// The current level of each skill.
 	Dictionary<SkillId, int> skillLevels = new Dictionary<SkillId, int>();
