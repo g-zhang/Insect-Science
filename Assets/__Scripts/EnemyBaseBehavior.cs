@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class EnemyBaseBehavior : MonoBehaviour {
     public enum EnemyState { dead = 0, normal, sleeping, alert, attacking };
@@ -48,28 +49,34 @@ public class EnemyBaseBehavior : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        //gather enviroment data
         getVisionVals();
         Debug.DrawRay(visionPos, visionVector.normalized * sightRange, Color.red);
         BaseClassUpdate();
 
-        Debug.DrawRay(Swarm.S.transform.position, Vector3.up * 3f, Color.green);
+        Awareness();
 
+        //state machine logic
         if(currState == EnemyState.normal)
         {
             if (patrolPath.Length > 0)
             {
                 Patrol();
+            } else
+            {
+                navagn.updateRotation = false;
+                navagn.Stop();
             }
-            if (SwarmInSight(sightRange, sightAngle))
+            if(currTarget != AttackTarget.none)
             {
                 currState = EnemyState.attacking;
             }
         } else if(currState == EnemyState.attacking)
         {
-            //navagn.enabled = false;
             navagn.Stop();
+            navagn.updateRotation = false;
             Attack();
-            if (!SwarmInSight(sightRange, sightAngle))
+            if (currTarget == AttackTarget.none)
             {
                 currState = EnemyState.normal;
             }
@@ -106,22 +113,20 @@ public class EnemyBaseBehavior : MonoBehaviour {
         if(currWaitTime > 0)
         {
             navagn.updateRotation = false;
-            navagn.Stop();
-            
-            //navagn.enabled = false;
+            navagn.Stop();     
 
             currWaitTime -= Time.deltaTime;
         }
         else
         {
-            navagn.Resume();
-            navagn.updateRotation = true;
-            //navagn.enabled = true;
             if (ArrivedAt(nextPoint))
             {
                 currWaitTime = nextWaitTime;
                 patrolIndex = (patrolIndex + 1) % patrolPath.Length;
                 SetNext(patrolPath[patrolIndex]);
+
+                navagn.updateRotation = false;
+                navagn.Stop();
             } else
             {
                 Vector3 targetDir = new Vector3(nextPoint.x, body.transform.position.y, body.transform.position.z) - transform.position;
@@ -131,6 +136,8 @@ public class EnemyBaseBehavior : MonoBehaviour {
                 }
                 else
                 {
+                    navagn.Resume();
+                    navagn.updateRotation = true;
                     navagn.destination = nextPoint;
                 }
             }
@@ -170,44 +177,94 @@ public class EnemyBaseBehavior : MonoBehaviour {
         }
     }
 
-
     //returns true if swarm is in range
     public bool SwarmInRange(float range)
     {
-        return (Vector3.Distance(Swarm.S.transform.position, visionPos) <= range);
+        try
+        {
+            return (Vector3.Distance(Swarm.S.transform.position, visionPos) <= range);
+        } catch(NullReferenceException)
+        {
+            return false;
+        }
+        
     }
     
     public bool SwarmInSight(float range, float visionAngle)
     {
-        Vector3 targetDir = Swarm.S.transform.position - visionPos;
-        Vector3 targetDirX = new Vector3(targetDir.x, 0, 0);
-        //Debug.DrawRay(body.transform.position, targetDir, Color.blue);
-        //Debug.DrawRay(body.transform.position, targetDirX, Color.cyan);
-        return SwarmInRange(range) && (Vector3.Angle(targetDir, visionVector) <= visionAngle)
-                                   && (Vector3.Angle(targetDirX, visionVector) <= visionPeriphal);
+        try
+        {
+            Vector3 targetDir = Swarm.S.transform.position - visionPos;
+            Vector3 targetDirX = new Vector3(targetDir.x, 0, 0);
+            //Debug.DrawRay(body.transform.position, targetDir, Color.blue);
+            //Debug.DrawRay(body.transform.position, targetDirX, Color.cyan);
+            return SwarmInRange(range) && (Vector3.Angle(targetDir, visionVector) <= visionAngle)
+                                       && (Vector3.Angle(targetDirX, visionVector) <= visionPeriphal);
+        } catch(NullReferenceException)
+        {
+            return false;
+        }
+    }
+
+    public Vector3 getScientistCenterPos()
+    {
+        return Scientist.S.transform.position + new Vector3(0f, 1f, 0f);
     }
 
     public bool ScientistInRange(float range)
     {
-        return (Vector3.Distance(Scientist.S.transform.position, visionPos) <= range);
+        try
+        {
+            return (Vector3.Distance(getScientistCenterPos(), visionPos) <= range);
+        }
+        catch (NullReferenceException)
+        {
+            print("Warning, scientist doesn't exist in this scene!");
+            return false;
+        }
     }
 
     public bool ScientistInSight(float range, float visionAngle)
     {
-        Vector3 targetDir = Scientist.S.transform.position - visionPos;
-        Vector3 targetDirX = new Vector3(targetDir.x, 0, 0);
-        //Debug.DrawRay(body.transform.position, targetDir, Color.blue);
-        //Debug.DrawRay(body.transform.position, targetDirX, Color.cyan);
-        return ScientistInRange(range) && (Vector3.Angle(targetDir, visionVector) <= visionAngle)
-                                   && (Vector3.Angle(targetDirX, visionVector) <= visionPeriphal);
+        try
+        {
+            Vector3 targetDir = getScientistCenterPos() - visionPos;
+            Vector3 targetDirX = new Vector3(targetDir.x, 0, 0);
+            //Debug.DrawRay(visionPos, targetDir, Color.blue);
+            //Debug.DrawRay(visionPos, targetDirX, Color.cyan);
+            return ScientistInRange(range) && (Vector3.Angle(targetDir, visionVector) <= visionAngle)
+                                       && (Vector3.Angle(targetDirX, visionVector) <= visionPeriphal);
+        }
+        catch (NullReferenceException)
+        {
+            print("Warning, scientist doesn't exist in this scene!");
+            return false;
+        }
     }
 
     /* VIRTUAL FUNCTIONS */
 
     //this function decides how the enemy detects the player, either scientist or swarm
+    //sets 
     public virtual void Awareness()
     {
-
+        if (ScientistInSight(sightRange, sightAngle))
+        {
+            currTarget = AttackTarget.scientist;
+            currTargetPos = getScientistCenterPos();
+            Debug.DrawRay(Scientist.S.transform.position, Vector3.up * 3f, Color.green);
+        }
+        else if(SwarmInSight(sightRange, sightAngle))
+        {
+            currTarget = AttackTarget.swarm;
+            currTargetPos = Swarm.S.transform.position;
+            Debug.DrawRay(Swarm.S.transform.position, Vector3.up * 3f, Color.green);
+        }
+        else
+        {
+            currTarget = AttackTarget.none;
+            currTargetPos = Vector3.zero;
+        }
     }
 
     public virtual void Attack()

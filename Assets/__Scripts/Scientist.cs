@@ -6,7 +6,7 @@ public class Scientist : MonoBehaviour {
     public static Scientist S;
 
 
-	void Start () {
+	void Awake () {
 	   S = this;
 	}
 	

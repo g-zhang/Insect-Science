@@ -40,8 +40,16 @@ public class EnemyFrogAI : EnemyBaseBehavior {
                                                      tongue.transform.localScale.y,
                                                      Mathf.PingPong(currAnimationTime * AttackSpeed, AttackRange));
             tongue.transform.localPosition = new Vector3(tongue.transform.localPosition.x, tongue.transform.localPosition.y, (tongue.transform.lossyScale.z / 2));
-            Quaternion rot = Quaternion.Euler(attackAngle, 0f, 0f);
-            tongueAxis.transform.localRotation = Quaternion.Slerp(tongueAxis.transform.localRotation, rot, .05f);
+            //Quaternion rot = Quaternion.Euler(attackAngle, 0f, 0f);
+            //tongueAxis.transform.localRotation = Quaternion.Slerp(tongueAxis.transform.localRotation, rot, .05f);
+            if(currTarget != AttackTarget.none)
+            {
+                tongueAxis.transform.LookAt(currTargetPos);
+            } else
+            {
+                tongueAxis.transform.localRotation = Quaternion.Slerp(tongueAxis.transform.localRotation, initTongueRot, .05f);
+            }
+            
 
             currAnimationTime += Time.deltaTime;
         } else
