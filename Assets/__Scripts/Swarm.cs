@@ -166,6 +166,7 @@ public class Swarm : MonoBehaviour {
 
     void regenerateFlies() {
         health = (health < maxHealth) ? health + 1 : health;
+		Main.S.flies = health;
     }
 
     /*

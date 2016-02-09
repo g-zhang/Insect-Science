@@ -13,7 +13,8 @@ public class Main : MonoBehaviour {
 		get { return _health; }
 		set {
 			_health = value;
-			InGameUI.S.UpdateHealth();
+			if (InGameUI.S != null)
+				InGameUI.S.UpdateHealth();
 		}
 	}
 
@@ -22,7 +23,8 @@ public class Main : MonoBehaviour {
 		get { return _flies; }
 		set {
 			_flies = value;
-			InGameUI.S.UpdateFlies();
+			if (InGameUI.S != null)
+				InGameUI.S.UpdateFlies();
 		}
 	}
 
@@ -31,7 +33,8 @@ public class Main : MonoBehaviour {
 		get { return _carbon; }
 		set {
 			_carbon = value;
-			InGameUI.S.UpdateCarbon();
+			if (InGameUI.S != null)
+				InGameUI.S.UpdateCarbon();
 		}
 	}
 
@@ -40,13 +43,19 @@ public class Main : MonoBehaviour {
 		get { return _lithium; }
 		set {
 			_lithium = value;
-			InGameUI.S.UpdateLithium();
+			if (InGameUI.S != null)
+				InGameUI.S.UpdateLithium();
 		}
 	}
 
 	void Awake () {
         // Set the singleton
         S = this;
+	}
+
+	void Start() {
+		carbon = Persistent.S.carbon;
+		lithium = Persistent.S.lithium;
 	}
 	
 	// Update is called once per frame
