@@ -2,10 +2,11 @@
 using System.Collections;
 
 public class EnemyBaseBehavior : MonoBehaviour {
-    public enum EnemyState { dead = 0, normal, sleeping, alert, attacking }
+    public enum EnemyState { dead = 0, normal, sleeping, alert, attacking };
+    public enum AttackTarget { none = 0, scientist, swarm };
 
     //Properties
-    public int MaxHP = 10;
+    public float MaxHP = 10;
     public float DefenseMult = 1.0f;
     public float MovementSpeed = .5f;
     public float RotationSpeed = .25f;
@@ -14,11 +15,14 @@ public class EnemyBaseBehavior : MonoBehaviour {
     public float minArriveDistance = 0.0f;
     public float sightRange = 5f;
     public float sightAngle = 45f;
+    public float visionPeriphal = 5f;
 
     //enemy status
     public bool __Status_____________;
     public EnemyState currState = EnemyState.normal;
-    public int currHP;
+    public AttackTarget currTarget = AttackTarget.none;
+    public Vector3 currTargetPos = Vector3.zero;
+    public float currHP;
     public float currWaitTime = 0f;
 
     NavMeshAgent navagn;
@@ -71,24 +75,6 @@ public class EnemyBaseBehavior : MonoBehaviour {
             }
         }
 	}
-
-
-    //returns true if scientist is in range
-    public bool SwarmInRange(float range)
-    {
-        return (Vector3.Distance(Swarm.S.transform.position, visionPos) <= range);
-    }
-
-    public bool SwarmInSight(float range, float visionAngle)
-    {
-        Vector3 targetDir = Swarm.S.transform.position - visionPos;
-        Vector3 targetDirX = new Vector3(targetDir.x, 0, 0);
-        //Debug.DrawRay(body.transform.position, targetDir, Color.blue);
-        //Debug.DrawRay(body.transform.position, targetDirX, Color.cyan);
-        return SwarmInRange(range) && (Vector3.Angle(targetDir, visionVector) <= visionAngle)
-                                   && (Vector3.Angle(targetDirX, visionVector) <= 5f);
-    }
-
 
     //move to functions are using unity navmesh agent pathfinding
     public void SetNext(GameObject point)
@@ -149,6 +135,79 @@ public class EnemyBaseBehavior : MonoBehaviour {
                 }
             }
         }
+    }
+
+    /* DAMAGE TAKEN AND COLLISION */
+    void OnTriggerEnter(Collider coll)
+    {
+        if (coll.gameObject.tag == "Swarm")
+        {
+            TakeHit();
+            Invoke("TakeHit", 1f);
+        }
+        else {
+            // ... other collider logic if you need it
+        }
+    }
+
+    void OnTriggerExit(Collider coll)
+    {
+        if (coll.gameObject.tag == "Swarm")
+        {
+            CancelInvoke("TakeHit");
+        }
+        else {
+            // ... other collider logic if you need it
+        }
+    }
+
+    void TakeHit()
+    {
+        currHP -= Swarm.S.attackPower;
+        if (currHP <= 0)
+        {
+            // ... die
+        }
+    }
+
+
+    //returns true if swarm is in range
+    public bool SwarmInRange(float range)
+    {
+        return (Vector3.Distance(Swarm.S.transform.position, visionPos) <= range);
+    }
+    
+    public bool SwarmInSight(float range, float visionAngle)
+    {
+        Vector3 targetDir = Swarm.S.transform.position - visionPos;
+        Vector3 targetDirX = new Vector3(targetDir.x, 0, 0);
+        //Debug.DrawRay(body.transform.position, targetDir, Color.blue);
+        //Debug.DrawRay(body.transform.position, targetDirX, Color.cyan);
+        return SwarmInRange(range) && (Vector3.Angle(targetDir, visionVector) <= visionAngle)
+                                   && (Vector3.Angle(targetDirX, visionVector) <= visionPeriphal);
+    }
+
+    public bool ScientistInRange(float range)
+    {
+        return (Vector3.Distance(Scientist.S.transform.position, visionPos) <= range);
+    }
+
+    public bool ScientistInSight(float range, float visionAngle)
+    {
+        Vector3 targetDir = Scientist.S.transform.position - visionPos;
+        Vector3 targetDirX = new Vector3(targetDir.x, 0, 0);
+        //Debug.DrawRay(body.transform.position, targetDir, Color.blue);
+        //Debug.DrawRay(body.transform.position, targetDirX, Color.cyan);
+        return ScientistInRange(range) && (Vector3.Angle(targetDir, visionVector) <= visionAngle)
+                                   && (Vector3.Angle(targetDirX, visionVector) <= visionPeriphal);
+    }
+
+    /* VIRTUAL FUNCTIONS */
+
+    //this function decides how the enemy detects the player, either scientist or swarm
+    public virtual void Awareness()
+    {
+
     }
 
     public virtual void Attack()
