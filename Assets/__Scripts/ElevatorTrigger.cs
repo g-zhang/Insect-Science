@@ -30,9 +30,12 @@ public class ElevatorTrigger : MonoBehaviour {
     }
     
     public void UseElevator() {
-           Vector3 pos = Scientist.S.transform.position;
-           pos.y = destination.transform.position.y + 0.1f;
-           Scientist.S.transform.position = pos;
+           Vector3 sciPos = Scientist.S.transform.position;
+           Vector3 swarmPos = Swarm.S.transform.position;
+           sciPos.y = destination.transform.position.y + 0.1f;
+           swarmPos.y = destination.transform.position.y + 1.1f;
+           Scientist.S.transform.position = sciPos;
+           Swarm.S.transform.position = swarmPos;
            destination.active = false;
            Invoke("ActivateDestinationElevator", 1);
     }

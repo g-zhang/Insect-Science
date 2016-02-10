@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityStandardAssets.Characters.ThirdPerson;
 
 public enum SwarmState {
     Follow,         // The player is controlling the scientist and not attacking
@@ -16,35 +17,37 @@ public enum SwarmType {
 }
 
 public class Swarm : MonoBehaviour {
-    static public Swarm     S;                                  // The Swarm Singleton
+    static public Swarm     S;                                      // The Swarm Singleton
 
-    public Transform        poi;                                // Transform of the poi the swarm is going to follow
-    public Vector3          offset = new Vector3(0f, 2f);       // Offset so the swarm always above the poi
-    public float            easingU = 0.03f;                    // Used for linear interpolation
-    public float            boxBuffer = 1.5f;                   // Box buffer around the poi
-                                                                // Buffer used so that the swarm is not directly over the poi
+    public Transform        poi;                                    // Transform of the poi the swarm is going to follow
+    public Vector3          offset = new Vector3(0f, 1f);           // Offset so the swarm always above the poi
+    public Vector3          crouchOffset = new Vector3(0f, 0.5f);   // Offset when crouching
+    public float            easingU = 0.03f;                        // Used for linear interpolation
+    public float            boxBuffer = 1.5f;                       // Box buffer around the poi
+                                                                    // Buffer used so that the swarm is not directly over the poi
 
     public SwarmState       state;                              // The current state of the swarm
+    public bool             crouch;                             // If the scientist is crouching
     public float            moveSpeedMultiplier = 2f;           // Used to calculate swarm movement speed
     public float            distFromScientistMultiplier = 5f;   // Used to calculate the maximum distance the swarm can move from the scientist.
     public float            swarmHealthMult = 15f;              // Used to calculate the health of the swarm (i.e. the number of flies)
 
-    public int              maxHealth;                          // Maximum health of the swarm. Also indicates maximum number of flies in swarm.
-    public int              health;                             // Current health of the swarm. Also indicates current number of flies in swarm.
-    public float            swarmRegenerationRate;              // How fast flies (health) are regenerated
-    public SwarmType        type;                               // Type of flies in swarm
-    public float            moveSpeed;                          // Movement speed of the swarm
-    public float            maxDistFromScientist;               // Maximum distance the flies can move from the scientist
-    public float            attackPower;                        // How much damage the swarm does
-    public SphereCollider   soundTrigger;                       // Sphere Collider used to determine if an enemy hears the flies or not
+    public int              maxHealth;              // Maximum health of the swarm. Also indicates maximum number of flies in swarm.
+    public int              health;                 // Current health of the swarm. Also indicates current number of flies in swarm.
+    public float            swarmRegenerationRate;  // How fast flies (health) are regenerated
+    public SwarmType        type;                   // Type of flies in swarm
+    public float            moveSpeed;              // Movement speed of the swarm
+    public float            maxDistFromScientist;   // Maximum distance the flies can move from the scientist
+    public float            attackPower;            // How much damage the swarm does
+    public SphereCollider   soundTrigger;           // Sphere Collider used to determine if an enemy hears the flies or not
 
-    public bool             canAttackAndMove;                   // Powerup allows swarm to attack and move at the same time
-    public bool             canCoverLights;                     // Powerup allows swarm to cover lights and darken an area
-    public bool             hasVenom;                           // Powerup allows swarm to slow enemies when attacking them
-    public bool             canEatWood;                         // Powerup allows swarm to eat through wood
+    public bool             canAttackAndMove;   // Powerup allows swarm to attack and move at the same time
+    public bool             canCoverLights;     // Powerup allows swarm to cover lights and darken an area
+    public bool             hasVenom;           // Powerup allows swarm to slow enemies when attacking them
+    public bool             canEatWood;         // Powerup allows swarm to eat through wood
 
-    public Rigidbody        rigid;                              // Rigidbody component of the swarm
-    public SphereCollider   sc;                                 // Sphere collider of the swarm
+    public Rigidbody        rigid;  // Rigidbody component of the swarm
+    public SphereCollider   sc;     // Sphere collider of the swarm
 
 
 	// Use this for initialization
@@ -76,17 +79,26 @@ public class Swarm : MonoBehaviour {
 
         // Begin regenerating flies
         Invoke("regenerateFlies", 1f / swarmRegenerationRate);
+
+        // Ignore collisions between scientist and swarm
+        Physics.IgnoreCollision(sc, poi.transform.gameObject.GetComponent<CapsuleCollider>());
     }
 
+    void Update() {
+        crouch = poi.gameObject.GetComponent<ThirdPersonCharacter>().m_Crouching;
+    }
     void FixedUpdate () {
 
         // Different movements based on state
         switch (state) {
             // If the swarm is following the scientist
             case SwarmState.Follow:
+                // Adjust offset if crouching
+                Vector3 offsetVec = (crouch) ? crouchOffset : offset;
+
                 // Get the positions of the poi and the swarm
                 Vector3 swarmPos = transform.position;
-                Vector3 poiPos = poi.position + offset;
+                Vector3 poiPos = poi.position + offsetVec;
 
                 // Set new positions so that the swarm is not directly over the poi
                 if (swarmPos.x >= poiPos.x + boxBuffer) {
