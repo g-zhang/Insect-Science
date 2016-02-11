@@ -27,7 +27,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 		float m_CapsuleHeight;
 		Vector3 m_CapsuleCenter;
 		CapsuleCollider m_Capsule;
-		public bool m_Crouching;
+		public bool m_Crouching; // Public so it can be accessed by the swarm
 
         int allInteractableLayers;
 
