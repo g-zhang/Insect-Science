@@ -22,6 +22,4 @@ public class RoomLight : MonoBehaviour {
 
 		turnedOn = _turnedOn;
 	}
-
-
 }
