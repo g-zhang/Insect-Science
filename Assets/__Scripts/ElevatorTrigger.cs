@@ -10,25 +10,36 @@ public class ElevatorTrigger : MonoBehaviour {
 	
 	}
 	
-	// Update is called once per frame
-	void Update () {
 	
-	}
     void OnTriggerEnter(Collider other) {
-        ShowUI();
+        if(other.gameObject.tag == "Scientist")
+        {
+            ShowUI();
+        }
 
     }
     void OnTriggerStay(Collider other) {
-        float interact = Input.GetAxis("Interact");
-        if (interact > 0 && active) {
-            UseElevator(); 
+        if(other.gameObject.tag == "Player")
+        {
+            float interact = Input.GetAxis("Interact");
+            if (interact > 0 && active) {
+                UseElevator(); 
+            }       
+        }
+    }
+    void OnTriggerExit(Collider other) {
+        if(other.gameObject.tag == "Player")
+        {
+            HideUI();
         }
     }
     // Shows the "Press e to use elevator" UI
     public void ShowUI() {
-        
+        // TODO
     }
-    
+    public void HideUI() {
+        // TODO
+    }
     public void UseElevator() {
            Vector3 sciPos = Scientist.S.transform.position;
            Vector3 swarmPos = Swarm.S.transform.position;
