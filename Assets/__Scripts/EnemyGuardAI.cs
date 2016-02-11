@@ -36,7 +36,7 @@ public class EnemyGuardAI : EnemyBaseBehavior {
     public void GunAnimation()
     {
         //lock the gun at the target
-        if (currTarget != AttackTarget.none)
+        if (currState == EnemyState.attacking)
         {
             Weapon.transform.LookAt(currTargetPos);
             //Quaternion newRot = Quaternion.LookRotation(Weapon.transform.position - currTargetPos);

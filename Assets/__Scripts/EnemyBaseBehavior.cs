@@ -3,12 +3,14 @@ using System.Collections;
 using System;
 
 public class EnemyBaseBehavior : MonoBehaviour {
-    public enum EnemyState { dead = 0, normal, sleeping, alert, attacking };
+    public enum EnemyState { dead = 0, normal, sleeping, alert, attacking, swarmed };
     public enum AttackTarget { none = 0, scientist, swarm };
 
     //Properties
     public float MaxHP = 10;
-    public float DefenseMult = 1.0f;
+    public float SwarmDistance = .1f; //distance from head in which guard is considered distracted
+    public float RunawayDistance = 10f;
+    public float RunawayTime = 10f;
     public float MovementSpeed = .5f;
     public float RotationSpeed = .25f;
     public GameObject[] patrolPath;
@@ -25,19 +27,22 @@ public class EnemyBaseBehavior : MonoBehaviour {
     public Vector3 currTargetPos = Vector3.zero;
     public float currHP;
     public float currWaitTime = 0f;
+    public float currRunawayTime = 0f;
 
     NavMeshAgent navagn;
     protected Rigidbody body;
+    protected Collider coll;
     Vector3 nextPoint;
     float nextWaitTime = 0f;
     protected Vector3 visionVector = Vector3.zero;
-    protected Vector3 visionPos = Vector3.zero;
+    public Vector3 visionPos = Vector3.zero;
 
 	// Use this for initialization
 	void Start () {
         currHP = MaxHP;
         body = GetComponent<Rigidbody>();
         navagn = GetComponent<NavMeshAgent>();
+        coll = GetComponent<Collider>();
 
         BaseClassStart();
 
@@ -67,7 +72,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
                 navagn.updateRotation = false;
                 navagn.Stop();
             }
-            if(currTarget != AttackTarget.none)
+            if(currTarget != AttackTarget.none && currState == EnemyState.normal)
             {
                 currState = EnemyState.attacking;
             }
@@ -79,6 +84,17 @@ public class EnemyBaseBehavior : MonoBehaviour {
             if (currTarget == AttackTarget.none)
             {
                 currState = EnemyState.normal;
+            }
+        } else if(currState == EnemyState.swarmed)
+        {
+            if(currRunawayTime > 0)
+            {
+                Patrol();
+                currRunawayTime -= Time.deltaTime;
+            } else
+            {
+                currState = EnemyState.normal;
+                SetNext(patrolPath[patrolIndex]);
             }
         }
 	}
@@ -144,36 +160,21 @@ public class EnemyBaseBehavior : MonoBehaviour {
         }
     }
 
-    /* DAMAGE TAKEN AND COLLISION */
-    void OnTriggerEnter(Collider coll)
+    void Runaway()
     {
-        if (coll.gameObject.tag == "Swarm")
-        {
-            TakeHit();
-            Invoke("TakeHit", 1f);
-        }
-        else {
-            // ... other collider logic if you need it
-        }
+        Vector3 runawayPos = body.transform.position + new Vector3(body.transform.forward.x, 0, 0) * RunawayDistance;
+        SetNext(runawayPos);
+        nextWaitTime = RunawayTime;
     }
 
-    void OnTriggerExit(Collider coll)
+    /* Swarm interaction */
+    void OnTriggerEnter(Collider other)
     {
-        if (coll.gameObject.tag == "Swarm")
+        if (other.gameObject.tag == "Swarm")
         {
-            CancelInvoke("TakeHit");
-        }
-        else {
-            // ... other collider logic if you need it
-        }
-    }
-
-    void TakeHit()
-    {
-        currHP -= Swarm.S.attackPower;
-        if (currHP <= 0)
-        {
-            // ... die
+            Runaway();
+            currRunawayTime = RunawayTime;
+            currState = EnemyState.swarmed;
         }
     }
 
