@@ -100,6 +100,7 @@ public class Swarm : MonoBehaviour {
         // Deduct a charge and begin regeneration (if it hasn't already been invoked)
         charges -= 1;
         if (!regenInvoked) Invoke("RegenerateSwarm", swarmRegenerationRate);
+        regenInvoked = true;
 
         AdjustSwarmSize(); // Adjust scale for big swarm (make it smaller)
         CreateSubSwarm();  // Create sub swarm
