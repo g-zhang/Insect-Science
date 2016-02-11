@@ -25,4 +25,9 @@ public class Projectile : MonoBehaviour {
             }
         }
 	}
+
+    void OnTriggerExit(Collider coll)
+    {
+        Destroy(this.gameObject);
+    }
 }
