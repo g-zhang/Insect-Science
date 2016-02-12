@@ -112,6 +112,7 @@ public class Swarm : MonoBehaviour {
 
     void AdjustSwarmSize() {
         transform.localScale = ((float)charges / (float)maxCharges) * maxSwarmScale;
+		Main.S.flyCharges = charges;
         // TODO: tuning adjustments
     }
 
