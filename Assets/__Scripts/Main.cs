@@ -5,12 +5,31 @@ using UnityEngine.UI;
 public class Main : MonoBehaviour {
     static public Main S;                   // Main Singleton.
 
-	public GameObject interactTextPrefab;	// Prefab for the interaction popup text.
+	public GameObject interactTextPrefab;   // Prefab for the interaction popup text.
+	public GameObject flyChargePrefab;
     public bool controlScientist = true;    // The player starts the game controlling the scientist.
 
 	// Holds all the currently shown popups.  There can be multiple, so this is a Dictionary.
 	Dictionary<GameObject, Text> interactTexts = new Dictionary<GameObject, Text>();
 	GameObject interactCanvas;
+	List<GameObject> flyChargeObjs = new List<GameObject>();
+	
+	public int flyCharges {
+		get { return flyChargeObjs.Count; }
+		set {
+			int oldCharges = flyChargeObjs.Count;
+			for (int i = oldCharges; i < value; ++i) {
+				var charge = Instantiate(flyChargePrefab);
+				charge.transform.SetParent(interactCanvas.transform);
+				flyChargeObjs.Add(charge);
+			}
+			for (int i = value; i < oldCharges; ++i) {
+				var obj = flyChargeObjs[flyChargeObjs.Count - 1];
+				Destroy(obj);
+				flyChargeObjs.RemoveAt(flyChargeObjs.Count - 1);
+			}
+		}
+	}
 
 	void Awake () {
         // Set the singleton
@@ -19,7 +38,9 @@ public class Main : MonoBehaviour {
 		// Create a canvas for interact popups to be on.
 		interactCanvas = new GameObject("InteractPopupCanvas");
 		interactCanvas.AddComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
-		interactCanvas.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+		interactCanvas.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+
+		flyCharges = 3;
 	}
 
 	void Update() {
@@ -34,6 +55,15 @@ public class Main : MonoBehaviour {
 			screenPos.y = Mathf.Clamp(screenPos.y, height / 2, Screen.height - height / 2);
 
 			kvp.Value.transform.position = screenPos;
+		}
+
+		float xOffset = 0f;
+		foreach (var obj in flyChargeObjs) {
+			var screenPos = Camera.main.WorldToScreenPoint(Swarm.S.transform.position) + new Vector3(0f, -20f);
+			screenPos.x += xOffset;
+			xOffset += flyChargePrefab.GetComponent<Image>().rectTransform.rect.width;
+
+			obj.transform.position = screenPos;
 		}
 	}
 

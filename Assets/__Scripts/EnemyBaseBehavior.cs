@@ -20,6 +20,10 @@ public class EnemyBaseBehavior : MonoBehaviour {
     [Header("Swarmed State Settings")]
     public float RunawayDistance = 10f;
     public float RunawayTime = 10f;
+    public float InteractPopupTime = .1f;
+    public bool ________________;
+    public float currPopupTime = 0f;
+    public bool isInteractable = false;
 
     [Header("Light Switch Settings")]
     public bool EnableLight = false;
@@ -71,6 +75,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
         BaseClassUpdate();
 
         Awareness();
+        OnInteractUpdate();
 
         //state machine logic
         if (currState == EnemyState.normal)
@@ -265,16 +270,18 @@ public class EnemyBaseBehavior : MonoBehaviour {
     /* Swarm interaction */
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Swarm")
+        if (other.gameObject.tag == "SmallSwarm")
         {
-            Main.S.ShowInteractPopup(gameObject, "Press E to Swarm Guard");
+            isInteractable = true;
+            currPopupTime = InteractPopupTime;
         }
 
     }
-    void OnTriggerStay(Collider other)
+    void OnInteractUpdate()
     {
-        if (other.gameObject.tag == "Swarm")
+        if(currPopupTime > 0)
         {
+            Main.S.ShowInteractPopup(gameObject, "Press E to Swarm Guard");
             float interact = Input.GetAxis("Interact");
             if (interact > 0 && currState != EnemyState.swarmed)
             {
@@ -282,11 +289,9 @@ public class EnemyBaseBehavior : MonoBehaviour {
                 currRunawayTime = RunawayTime;
                 currState = EnemyState.swarmed;
             }
-        }
-    }
-    void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.tag == "Swarm")
+
+            currPopupTime -= Time.deltaTime;
+        } else
         {
             Main.S.HideInteractPopup(gameObject);
         }
