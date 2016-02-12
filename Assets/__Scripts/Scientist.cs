@@ -12,12 +12,15 @@ public class Scientist : MonoBehaviour {
 	}
 
 	void OnTriggerStay(Collider other) {
+		if (!Main.S.controlScientist) {
+			return;
+		}
 		var door = other.GetComponentInParent<HallDoor>();
-		if (Input.GetKeyDown(KeyCode.Z) && door != null && !usedDoor) {
+		if (door != null && Input.GetAxis("Interact") > 0 && !usedDoor) {
 			var diff = transform.position - other.transform.position;
 			transform.position = diff + door.linkedDoor.transform.position + new Vector3(0f, 0.1f, 0f);
 			usedDoor = true;
-			Invoke("ResetUsedDoor", 0.1f);
+			Invoke("ResetUsedDoor", 0.5f);
 		}
 	}
 

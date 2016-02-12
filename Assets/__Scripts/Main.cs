@@ -24,6 +24,8 @@ public class Main : MonoBehaviour {
 				flyChargeObjs.Add(charge);
 			}
 			for (int i = value; i < oldCharges; ++i) {
+				var obj = flyChargeObjs[flyChargeObjs.Count - 1];
+				Destroy(obj);
 				flyChargeObjs.RemoveAt(flyChargeObjs.Count - 1);
 			}
 		}
@@ -36,7 +38,7 @@ public class Main : MonoBehaviour {
 		// Create a canvas for interact popups to be on.
 		interactCanvas = new GameObject("InteractPopupCanvas");
 		interactCanvas.AddComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
-		interactCanvas.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+		interactCanvas.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
 
 		flyCharges = 3;
 	}
