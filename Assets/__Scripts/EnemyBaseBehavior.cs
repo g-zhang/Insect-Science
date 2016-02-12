@@ -3,14 +3,11 @@ using System.Collections;
 using System;
 
 public class EnemyBaseBehavior : MonoBehaviour {
-    public enum EnemyState { dead = 0, normal, sleeping, alert, attacking, swarmed };
+    public enum EnemyState { dead = 0, normal, sleeping, alert, attacking, swarmed, investigate };
     public enum AttackTarget { none = 0, scientist, swarm };
 
     //Properties
     public float MaxHP = 10;
-    public float SwarmDistance = .1f; //distance from head in which guard is considered distracted
-    public float RunawayDistance = 10f;
-    public float RunawayTime = 10f;
     public float MovementSpeed = .5f;
     public float RotationSpeed = .25f;
     public GameObject[] patrolPath;
@@ -20,11 +17,16 @@ public class EnemyBaseBehavior : MonoBehaviour {
     public float sightAngle = 45f;
     public float visionPeriphal = 5f;
 
+    [Header("Swarmed State Settings")]
+    public float RunawayDistance = 10f;
+    public float RunawayTime = 10f;
+
     [Header("Light Switch Settings")]
     public bool EnableLight = false;
+    public float sightDampen = .5f; //multplier to the sightRange when lights are off
     public GameObject Light;
-    public GameObject LightSwitchPos;
-    public Vector3 offsetFrom2d = Vector3.zero;
+    public GameObject[] investigatePath;
+    public int ipathIdx = 0;
 
     //enemy status
     [Header("Status")]
@@ -43,8 +45,11 @@ public class EnemyBaseBehavior : MonoBehaviour {
     protected Vector3 visionVector = Vector3.zero;
     public Vector3 visionPos = Vector3.zero;
 
-	// Use this for initialization
-	void Start () {
+    RigidbodyConstraints normalBody = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
+    RigidbodyConstraints enableZBody = RigidbodyConstraints.FreezeRotation;
+
+    // Use this for initialization
+    void Start () {
         currHP = MaxHP;
         body = GetComponent<Rigidbody>();
         navagn = GetComponent<NavMeshAgent>();
@@ -68,15 +73,22 @@ public class EnemyBaseBehavior : MonoBehaviour {
         Awareness();
 
         //state machine logic
-        if(currState == EnemyState.normal)
+        if (currState == EnemyState.normal)
         {
             if (patrolPath.Length > 0)
             {
-                Patrol();
+                Patrol(patrolPath);
             } else
             {
                 navagn.updateRotation = false;
                 navagn.Stop();
+            }
+            if(EnableLight && !Light.GetComponent<RoomLight>().turnedOn)
+            {
+                currState = EnemyState.investigate;
+                ipathIdx = 0;
+                SetNext(investigatePath[ipathIdx]);
+                navagn.destination = nextPoint;
             }
             if(currTarget != AttackTarget.none && currState == EnemyState.normal)
             {
@@ -95,12 +107,23 @@ public class EnemyBaseBehavior : MonoBehaviour {
         {
             if(currRunawayTime > 0)
             {
-                Patrol();
+                Patrol(patrolPath);
                 currRunawayTime -= Time.deltaTime;
             } else
             {
                 currState = EnemyState.normal;
                 SetNext(patrolPath[patrolIndex]);
+            }
+        } else if(currState == EnemyState.investigate)
+        {
+            if (currTarget != AttackTarget.none)
+            {
+                currState = EnemyState.attacking;
+            }
+            if (Investigate(investigatePath, 1))
+            {
+                print("Guard: Investigation Completed!");
+                currState = EnemyState.normal;
             }
         }
 	}
@@ -118,19 +141,22 @@ public class EnemyBaseBehavior : MonoBehaviour {
     }
 
     //returns true if arrived at point
-    public bool ArrivedAt(Vector3 point)
+    public bool ArrivedAt(Vector3 point, bool axis=true)
     {
         //ignore z and y axis
-        point.z = body.transform.position.z;
+        if(axis)
+        {
+            point.z = body.transform.position.z;
+        }
         point.y = body.transform.position.y;
         return Vector3.Distance(body.transform.position, point) <= minArriveDistance;
     }
-    public bool ArrivedAt(GameObject point)
+    public bool ArrivedAt(GameObject point, bool axis = true)
     {
-        return ArrivedAt(point.transform.position);
+        return ArrivedAt(point.transform.position, axis);
     }
 
-    public void Patrol()
+    public void Patrol(GameObject[] Path)
     {
         if(currWaitTime > 0)
         {
@@ -141,11 +167,17 @@ public class EnemyBaseBehavior : MonoBehaviour {
         }
         else
         {
+            Debug.DrawRay(nextPoint, Vector3.up * 5f, Color.blue);
+
+
+            body.constraints = normalBody;
+            body.transform.position = new Vector3(body.transform.position.x, body.transform.position.y, nextPoint.z);
+
             if (ArrivedAt(nextPoint))
             {
                 currWaitTime = nextWaitTime;
-                patrolIndex = (patrolIndex + 1) % patrolPath.Length;
-                SetNext(patrolPath[patrolIndex]);
+                patrolIndex = (patrolIndex + 1) % Path.Length;
+                SetNext(Path[patrolIndex]);
 
                 navagn.updateRotation = false;
                 navagn.Stop();
@@ -164,6 +196,63 @@ public class EnemyBaseBehavior : MonoBehaviour {
                 }
             }
         }
+    }
+
+    //returns true after path is completed
+    public bool Investigate(GameObject[] Path, int waitIdx)
+    {
+        if (currWaitTime > 0)
+        {
+            navagn.updateRotation = false;
+            navagn.Stop();
+
+            if (ipathIdx == waitIdx && !Light.GetComponent<RoomLight>().turnedOn)
+            {
+
+            } else
+            {
+                currWaitTime -= Time.deltaTime;
+            } 
+        }
+        else
+        {
+            body.constraints = enableZBody;
+            Debug.DrawRay(nextPoint, Vector3.up * 5f, Color.yellow);
+            if (ArrivedAt(nextPoint, false))
+            {
+                navagn.updateRotation = false;
+                navagn.Stop();
+
+                currWaitTime = nextWaitTime;
+                if(ipathIdx + 1 >= Path.Length)
+                {
+                    ipathIdx = 0;
+                    return true;
+                } else if(ipathIdx == waitIdx && !Light.GetComponent<RoomLight>().turnedOn)
+                {
+                    ipathIdx = waitIdx;
+                } else
+                {
+                    ipathIdx = (ipathIdx + 1) % Path.Length;
+                    SetNext(Path[ipathIdx]);
+                }
+            }
+            else
+            {
+                Vector3 targetDir = new Vector3(nextPoint.x, body.transform.position.y, nextPoint.z) - transform.position;
+                if (Vector3.Angle(body.transform.forward, targetDir) > 10f)
+                {
+                    body.transform.rotation = Quaternion.LookRotation(Vector3.Slerp(body.transform.forward, targetDir, RotationSpeed));
+                }
+                else
+                {
+                    navagn.Resume();
+                    navagn.updateRotation = true;
+                    navagn.destination = nextPoint;
+                }
+            }
+        }
+        return false;
     }
 
     void Runaway()
@@ -277,13 +366,18 @@ public class EnemyBaseBehavior : MonoBehaviour {
     //sets 
     public virtual void Awareness()
     {
-        if (ScientistInSight(sightRange, sightAngle))
+        float mult = 1f;
+        if(EnableLight && !Light.GetComponent<RoomLight>().turnedOn)
+        {
+            mult = sightDampen;
+        }
+        if (ScientistInSight(sightRange * mult, sightAngle))
         {
             currTarget = AttackTarget.scientist;
             currTargetPos = getScientistCenterPos();
             Debug.DrawRay(Scientist.S.transform.position, Vector3.up * 3f, Color.green);
         }
-        else if(SwarmInSight(sightRange, sightAngle))
+        else if(SwarmInSight(sightRange * mult, sightAngle))
         {
             currTarget = AttackTarget.swarm;
             currTargetPos = Swarm.S.transform.position;
