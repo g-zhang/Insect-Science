@@ -101,6 +101,7 @@ public class Swarm : MonoBehaviour {
         Main.S.controlScientist = false;
         // Deduct a charge and begin regeneration (if it hasn't already been invoked)
         charges -= 1;
+
         if (!regenInvoked) Invoke("RegenerateSwarm", swarmRegenerationRate);
         regenInvoked = true;
 
