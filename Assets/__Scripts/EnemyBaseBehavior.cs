@@ -20,8 +20,14 @@ public class EnemyBaseBehavior : MonoBehaviour {
     public float sightAngle = 45f;
     public float visionPeriphal = 5f;
 
+    [Header("Light Switch Settings")]
+    public bool EnableLight = false;
+    public GameObject Light;
+    public GameObject LightSwitchPos;
+    public Vector3 offsetFrom2d = Vector3.zero;
+
     //enemy status
-    public bool __Status_____________;
+    [Header("Status")]
     public EnemyState currState = EnemyState.normal;
     public AttackTarget currTarget = AttackTarget.none;
     public Vector3 currTargetPos = Vector3.zero;
@@ -197,10 +203,21 @@ public class EnemyBaseBehavior : MonoBehaviour {
         {
             Vector3 targetDir = Swarm.S.transform.position - visionPos;
             Vector3 targetDirX = new Vector3(targetDir.x, 0, 0);
+            bool lineOfSight = false;
+            Ray visionray = new Ray(visionPos, targetDir);
+            RaycastHit hit;
+            if(Physics.Raycast(visionray, out hit, sightRange))
+            {
+                if(hit.transform.tag == "Swarm")
+                {
+                    lineOfSight = true;
+                }
+            }
             //Debug.DrawRay(body.transform.position, targetDir, Color.blue);
             //Debug.DrawRay(body.transform.position, targetDirX, Color.cyan);
             return SwarmInRange(range) && (Vector3.Angle(targetDir, visionVector) <= visionAngle)
-                                       && (Vector3.Angle(targetDirX, visionVector) <= visionPeriphal);
+                                       && (Vector3.Angle(targetDirX, visionVector) <= visionPeriphal)
+                                       && lineOfSight;
         } catch(NullReferenceException)
         {
             return false;
@@ -231,10 +248,21 @@ public class EnemyBaseBehavior : MonoBehaviour {
         {
             Vector3 targetDir = getScientistCenterPos() - visionPos;
             Vector3 targetDirX = new Vector3(targetDir.x, 0, 0);
+            bool lineOfSight = false;
+            Ray visionray = new Ray(visionPos, targetDir);
+            RaycastHit hit;
+            if (Physics.Raycast(visionray, out hit, sightRange))
+            {
+                if (hit.transform.tag == "Player")
+                {
+                    lineOfSight = true;
+                }
+            }
             //Debug.DrawRay(visionPos, targetDir, Color.blue);
             //Debug.DrawRay(visionPos, targetDirX, Color.cyan);
             return ScientistInRange(range) && (Vector3.Angle(targetDir, visionVector) <= visionAngle)
-                                       && (Vector3.Angle(targetDirX, visionVector) <= visionPeriphal);
+                                       && (Vector3.Angle(targetDirX, visionVector) <= visionPeriphal)
+                                       && lineOfSight;
         }
         catch (NullReferenceException)
         {

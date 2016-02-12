@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class EnemyGuardAI : EnemyBaseBehavior {
-    public bool __Guard______________;
+    [Header("Enemy Guard")]
     public GameObject Weapon;
     public GameObject Barrel;
     public GameObject Projectile;

@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class EnemyFrogAI : EnemyBaseBehavior {
-    public bool __Frog_______________;
+    [Header("Frog")]
     public GameObject tongueAxis;
     public GameObject tongue;
     public float AttackRange = 5f;
