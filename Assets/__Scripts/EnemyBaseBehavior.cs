@@ -267,9 +267,28 @@ public class EnemyBaseBehavior : MonoBehaviour {
     {
         if (other.gameObject.tag == "Swarm")
         {
-            Runaway();
-            currRunawayTime = RunawayTime;
-            currState = EnemyState.swarmed;
+            Main.S.ShowInteractPopup(gameObject, "Press E to Swarm Guard");
+        }
+
+    }
+    void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.tag == "Swarm")
+        {
+            float interact = Input.GetAxis("Interact");
+            if (interact > 0 && currState != EnemyState.swarmed)
+            {
+                Runaway();
+                currRunawayTime = RunawayTime;
+                currState = EnemyState.swarmed;
+            }
+        }
+    }
+    void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "Swarm")
+        {
+            Main.S.HideInteractPopup(gameObject);
         }
     }
 
