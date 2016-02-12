@@ -44,9 +44,11 @@ public class Swarm : MonoBehaviour {
         sc = GetComponent<SphereCollider>();
 
         soundTrigger = transform.Find("Noise Trigger").GetComponent<SphereCollider>();
+	}
 
-        // Don't want the scientist and swarm colliding
-        Physics.IgnoreCollision(sc, Scientist.S.GetComponent<CapsuleCollider>());
+	void Start() {
+		// Don't want the scientist and swarm colliding
+		Physics.IgnoreCollision(sc, Scientist.S.GetComponent<CapsuleCollider>());
 	}
 
     void Update() {

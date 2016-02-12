@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class RoomCamera : MonoBehaviour {
 	// Z (up/down) angle from where the camera is facing that the lines will point.
@@ -18,6 +19,8 @@ public class RoomCamera : MonoBehaviour {
 			rightLine.enabled = _turnedOn;
 		}
 	}
+
+	bool spotted = false;
 
 	GameObject leftLineObj;
 	GameObject rightLineObj;
@@ -61,6 +64,9 @@ public class RoomCamera : MonoBehaviour {
 	// Updates the ending position of the given lineObj and line and also checks if the player is
 	// within the field of view.
 	void UpdateLineObject(GameObject lineObj, LineRenderer line) {
+		if (spotted)
+			return;
+
 		var transform = lineObj.transform;
 
 		const float castDistance = 10f;
@@ -69,7 +75,8 @@ public class RoomCamera : MonoBehaviour {
 			line.SetPosition(1, hit.point);
 
 			if (hit.collider.tag == "Player") {
-
+				spotted = true;
+				SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 			}
 		}
 		else
