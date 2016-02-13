@@ -118,6 +118,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
             {
                 currState = EnemyState.normal;
                 SetNext(patrolPath[patrolIndex]);
+                navagn.destination = nextPoint;
             }
         } else if(currState == EnemyState.investigate)
         {
@@ -265,6 +266,8 @@ public class EnemyBaseBehavior : MonoBehaviour {
         Vector3 runawayPos = body.transform.position + new Vector3(body.transform.forward.x, 0, 0) * RunawayDistance;
         SetNext(runawayPos);
         nextWaitTime = RunawayTime;
+        currWaitTime = 0f;
+        navagn.destination = nextPoint;
     }
 
     /* Swarm interaction */
