@@ -28,6 +28,7 @@ public class Projectile : MonoBehaviour {
 
     void OnTriggerExit(Collider coll)
     {
+        print(coll.gameObject.tag);
         Destroy(this.gameObject);
     }
 }

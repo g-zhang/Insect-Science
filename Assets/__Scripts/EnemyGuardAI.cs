@@ -59,7 +59,7 @@ public class EnemyGuardAI : EnemyBaseBehavior {
         GameObject go = Instantiate(Projectile) as GameObject;
         go.transform.position = Barrel.transform.position;
         go.transform.rotation = Barrel.transform.rotation;
-        go.GetComponent<Rigidbody>().velocity = (currTargetPos - Weapon.transform.position) * MuzzleVelocity;
+        go.GetComponent<Rigidbody>().velocity = (currTargetPos - Weapon.transform.position).normalized * MuzzleVelocity;
 
         currCooldown += WeaponCooldown;
     }
