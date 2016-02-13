@@ -54,6 +54,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
 
     RigidbodyConstraints normalBody = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
     RigidbodyConstraints enableZBody = RigidbodyConstraints.FreezeRotation;
+    int sightLayerMask = ~(1 << 9 | 1 << 12);
 
     // Use this for initialization
     void Start () {
@@ -356,7 +357,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
             bool lineOfSight = false;
             Ray visionray = new Ray(visionPos, targetDir);
             RaycastHit hit;
-            if(Physics.Raycast(visionray, out hit, sightRange))
+            if(Physics.Raycast(visionray, out hit, sightRange, sightLayerMask))
             {
                 if(hit.transform.tag == "Swarm")
                 {
@@ -406,7 +407,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
             bool lineOfSight = false;
             Ray visionray = new Ray(visionPos, targetDir);
             RaycastHit hit;
-            if (Physics.Raycast(visionray, out hit, sightRange))
+            if (Physics.Raycast(visionray, out hit, sightRange, sightLayerMask))
             {
                 if (hit.transform.tag == "Player")
                 {
