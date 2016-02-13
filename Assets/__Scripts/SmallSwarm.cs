@@ -31,7 +31,7 @@ public class SmallSwarm : MonoBehaviour {
 		enemyLayer = LayerMask.NameToLayer("Enemies");
 		// Get gameobject compononets
 		rigid = GetComponent<Rigidbody>();
-		sc = GetComponent<SphereCollider>();
+		sc = transform.Find("Collider").GetComponent<SphereCollider>();
 
 		// Set variables
 		moveSpeed = Swarm.S.moveSpeed;
@@ -41,6 +41,7 @@ public class SmallSwarm : MonoBehaviour {
 												// and to calculate the scientist's position
         // Ignore collisions with the scientist                       
 		Physics.IgnoreCollision(sc, Scientist.S.GetComponent<CapsuleCollider>());
+		Physics.IgnoreCollision(sc, Swarm.S.GetComponent<SphereCollider>());
 	}
 
 	// Called every physics engine update
