@@ -22,7 +22,7 @@ public class ElevatorTrigger : MonoBehaviour {
         if(other.gameObject.tag == "Player")
         {
             float interact = Input.GetAxis("Interact");
-            if (interact > 0 && active) {
+            if (interact > 0 && active && Main.S.controlScientist) {
                 UseElevator(); 
             }       
         }

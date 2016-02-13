@@ -36,7 +36,7 @@ public class SmallSwarm : MonoBehaviour {
 		enemyDistractionTime = Swarm.S.enemyDistractionTime;
 		scientistTrans = Scientist.S.transform; // Used when camera switches back to the scientist
 												// and to calculate the scientist's position
-												// Ignore collisions with the scientist                       
+        // Ignore collisions with the scientist                       
 		Physics.IgnoreCollision(sc, Scientist.S.GetComponent<CapsuleCollider>());
 	}
 
