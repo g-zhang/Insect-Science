@@ -122,7 +122,6 @@ public class SmallSwarm : MonoBehaviour {
 	public void Interact(GameObject other) {
 		if (target != null)
 			return;
-		print("Interacting");
 		// Check what we collided with and see if we are actually able to interact with it.
 		target = other;
 		if (other.tag == "RoomCamera") {
@@ -141,10 +140,8 @@ public class SmallSwarm : MonoBehaviour {
 		if (target != null) {
 			InvokeRepeating("UpdateDisabledTimer", 0f, 1f);
 			targetOffset = transform.position - target.transform.position;
-			Debug.LogFormat("Guard position: {0}, offset: {1}", target.transform.position, targetOffset);
 		}
 		else {
-			print("Destroying");
 			Destroy(gameObject);
 		}
 
@@ -156,7 +153,7 @@ public class SmallSwarm : MonoBehaviour {
 	void UpdateDisabledTimer() {
 		if (target != null) {
 			// Update the interaction popup to reflect time remaining.
-			Main.S.ShowInteractPopup(target, string.Format("Disabled for {0} {1}", secondsRemaining, secondsRemaining > 1 ? "seconds" : "second"));
+			Main.S.ShowInteractPopup(target, secondsRemaining.ToString());
 			secondsRemaining--;
 			if (secondsRemaining < 0) {
 				// If our time is up, enable whatever we disabled when we started interacting with it.
