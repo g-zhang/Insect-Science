@@ -78,7 +78,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
         BaseClassUpdate();
 
         Awareness();
-        OnInteractUpdate();
+        //OnInteractUpdate();
 
         //state machine logic
         if (currState == EnemyState.normal)
@@ -279,17 +279,16 @@ public class EnemyBaseBehavior : MonoBehaviour {
     {
         if (other.gameObject.tag == "SmallSwarm")
 		{
-			if (currPopupTime <= 0f)
-				Main.S.ShowInteractPopup(gameObject, "Press E to Swarm Guard");
+			Main.S.ShowInteractPopup(gameObject, "Press E to Swarm Guard");
 			isInteractable = true;
             currPopupTime = InteractPopupTime;
 			hoverSwarm = other.gameObject.GetComponent<SmallSwarm>();
         }
-
     }
-    void OnInteractUpdate()
+
+    void OnTriggerStay(Collider other)
     {
-        if(currPopupTime > 0)
+        if (other.gameObject.tag == "SmallSwarm")
         {
             float interact = Input.GetAxis("Interact");
             if (interact > 0 && currState != EnemyState.swarmed)
@@ -297,17 +296,43 @@ public class EnemyBaseBehavior : MonoBehaviour {
                 Runaway();
                 currRunawayTime = RunawayTime;
                 currState = EnemyState.swarmed;
-				hoverSwarm.Interact(gameObject);
-				hoverSwarm = null;
+                hoverSwarm.Interact(gameObject);
+                hoverSwarm = null;
             }
-
-            currPopupTime -= Time.deltaTime;
-        } else
-        {
-            Main.S.HideInteractPopup(gameObject);
-			hoverSwarm = null;
         }
     }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "SmallSwarm")
+        {
+            Main.S.HideInteractPopup(gameObject);
+            hoverSwarm = null;
+            isInteractable = false;
+        }
+    }
+
+   // void OnInteractUpdate()
+   // {
+   //     if(currPopupTime > 0)
+   //     {
+   //         float interact = Input.GetAxis("Interact");
+   //         if (interact > 0 && currState != EnemyState.swarmed)
+   //         {
+   //             Runaway();
+   //             currRunawayTime = RunawayTime;
+   //             currState = EnemyState.swarmed;
+			//	hoverSwarm.Interact(gameObject);
+			//	hoverSwarm = null;
+   //         }
+
+   //         currPopupTime -= Time.deltaTime;
+   //     } else
+   //     {
+   //         Main.S.HideInteractPopup(gameObject);
+			//hoverSwarm = null;
+   //     }
+   // }
 
     //returns true if swarm is in range
     public bool SwarmInRange(float range)
