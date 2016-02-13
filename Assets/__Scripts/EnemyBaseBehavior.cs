@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using UnityStandardAssets.Characters.ThirdPerson;
 
 public class EnemyBaseBehavior : MonoBehaviour {
     public enum EnemyState { dead = 0, normal, sleeping, alert, attacking, swarmed, investigate };
@@ -16,6 +17,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
     public float sightRange = 5f;
     public float sightAngle = 45f;
     public float visionPeriphal = 5f;
+    public float attackingStayTime = 2f; //time the guard will stay there after seeing the player
 
     [Header("Swarmed State Settings")]
     public float RunawayDistance = 10f;
@@ -120,6 +122,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
                 currState = EnemyState.normal;
                 SetNext(patrolPath[patrolIndex]);
                 navagn.destination = nextPoint;
+                currWaitTime = 0;
             }
         } else if(currState == EnemyState.investigate)
         {
@@ -347,8 +350,13 @@ public class EnemyBaseBehavior : MonoBehaviour {
     }
 
     public Vector3 getScientistCenterPos()
-    {
-        return Scientist.S.transform.position + new Vector3(0f, 1f, 0f);
+    {   if(Scientist.S.GetComponent<ThirdPersonCharacter>().m_Crouching)
+        {
+            return Scientist.S.transform.position + new Vector3(0f, .5f, 0f);
+        } else
+        {
+            return Scientist.S.transform.position + new Vector3(0f, 1f, 0f);
+        }  
     }
 
     public bool ScientistInRange(float range)

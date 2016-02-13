@@ -39,6 +39,7 @@ public class EnemyGuardAI : EnemyBaseBehavior {
         if (currState == EnemyState.attacking)
         {
             Weapon.transform.LookAt(currTargetPos);
+            Debug.DrawRay(Weapon.transform.position, currTargetPos - Weapon.transform.position);
             //Quaternion newRot = Quaternion.LookRotation(Weapon.transform.position - currTargetPos);
             //Weapon.transform.localRotation = Quaternion.Slerp(Weapon.transform.localRotation, newRot, .5f);
         }
@@ -58,7 +59,7 @@ public class EnemyGuardAI : EnemyBaseBehavior {
         GameObject go = Instantiate(Projectile) as GameObject;
         go.transform.position = Barrel.transform.position;
         go.transform.rotation = Barrel.transform.rotation;
-        go.GetComponent<Rigidbody>().velocity = Weapon.transform.forward * MuzzleVelocity;
+        go.GetComponent<Rigidbody>().velocity = (currTargetPos - Weapon.transform.position) * MuzzleVelocity;
 
         currCooldown += WeaponCooldown;
     }
