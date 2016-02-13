@@ -15,6 +15,7 @@ public class KeypadTrigger : MonoBehaviour {
             if (interact > 0 && active) {
                 DeactivateDoor();
                 Destroy(other.gameObject);
+                Main.S.HideInteractPopup(this.gameObject);
                 Invoke("ActivateDoor", duration);
             }       
         }
