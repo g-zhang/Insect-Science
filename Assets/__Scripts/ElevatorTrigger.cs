@@ -12,7 +12,7 @@ public class ElevatorTrigger : MonoBehaviour {
 	
 	
     void OnTriggerEnter(Collider other) {
-        if(other.gameObject.tag == "Scientist")
+        if(other.gameObject.tag == "Player")
         {
             ShowUI();
         }
@@ -35,10 +35,10 @@ public class ElevatorTrigger : MonoBehaviour {
     }
     // Shows the "Press e to use elevator" UI
     public void ShowUI() {
-        // TODO
+        this.gameObject.transform.GetChild(0).gameObject.SetActive(true);
     }
     public void HideUI() {
-        // TODO
+        this.gameObject.transform.GetChild(0).gameObject.SetActive(false);
     }
     public void UseElevator() {
            Vector3 sciPos = Scientist.S.transform.position;
