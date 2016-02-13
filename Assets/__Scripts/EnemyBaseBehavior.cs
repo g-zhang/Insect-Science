@@ -48,6 +48,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
     float nextWaitTime = 0f;
     protected Vector3 visionVector = Vector3.zero;
     public Vector3 visionPos = Vector3.zero;
+	SmallSwarm hoverSwarm;
 
     RigidbodyConstraints normalBody = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
     RigidbodyConstraints enableZBody = RigidbodyConstraints.FreezeRotation;
@@ -274,9 +275,12 @@ public class EnemyBaseBehavior : MonoBehaviour {
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "SmallSwarm")
-        {
-            isInteractable = true;
+		{
+			if (currPopupTime <= 0f)
+				Main.S.ShowInteractPopup(gameObject, "Press E to Swarm Guard");
+			isInteractable = true;
             currPopupTime = InteractPopupTime;
+			hoverSwarm = other.gameObject.GetComponent<SmallSwarm>();
         }
 
     }
@@ -284,19 +288,21 @@ public class EnemyBaseBehavior : MonoBehaviour {
     {
         if(currPopupTime > 0)
         {
-            Main.S.ShowInteractPopup(gameObject, "Press E to Swarm Guard");
             float interact = Input.GetAxis("Interact");
             if (interact > 0 && currState != EnemyState.swarmed)
             {
                 Runaway();
                 currRunawayTime = RunawayTime;
                 currState = EnemyState.swarmed;
+				hoverSwarm.Interact(gameObject);
+				hoverSwarm = null;
             }
 
             currPopupTime -= Time.deltaTime;
         } else
         {
             Main.S.HideInteractPopup(gameObject);
+			hoverSwarm = null;
         }
     }
 

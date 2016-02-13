@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 
 public class Main : MonoBehaviour {
-    static public Main S;                   // Main Singleton.
+	static public Main S;                   // Main Singleton.
 
 	public GameObject interactTextPrefab;   // Prefab for the interaction popup text.
 	public GameObject flyChargePrefab;
-    public bool controlScientist = true;    // The player starts the game controlling the scientist.
+	public bool controlScientist = true;    // The player starts the game controlling the scientist.
 
 	// Holds all the currently shown popups.  There can be multiple, so this is a Dictionary.
 	Dictionary<GameObject, Text> interactTexts = new Dictionary<GameObject, Text>();
 	GameObject interactCanvas;
 	List<GameObject> flyChargeObjs = new List<GameObject>();
-	
+
 	public int flyCharges {
 		get { return flyChargeObjs.Count; }
 		set {
@@ -31,9 +31,9 @@ public class Main : MonoBehaviour {
 		}
 	}
 
-	void Awake () {
-        // Set the singleton
-        S = this;
+	void Awake() {
+		// Set the singleton
+		S = this;
 
 		// Create a canvas for interact popups to be on.
 		interactCanvas = new GameObject("InteractPopupCanvas");

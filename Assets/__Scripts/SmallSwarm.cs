@@ -21,11 +21,14 @@ public class SmallSwarm : MonoBehaviour {
 	// Set dynamically
 	public bool interacting = false;
 
-	GameObject target;			// Object this swarm is attacking/disabling.
+	GameObject target;          // Object this swarm is attacking/disabling.
 	int secondsRemaining = 10;  // Seconds remaining until this swarm dies (used after swarm starts attacking).
+	int enemyLayer;
+	Vector3 targetOffset;
 
 	// Use this for initialization
 	void Start() {
+		enemyLayer = LayerMask.NameToLayer("Enemies");
 		// Get gameobject compononets
 		rigid = GetComponent<Rigidbody>();
 		sc = GetComponent<SphereCollider>();
@@ -40,17 +43,12 @@ public class SmallSwarm : MonoBehaviour {
 		Physics.IgnoreCollision(sc, Scientist.S.GetComponent<CapsuleCollider>());
 	}
 
-	// Called once every frame
-	void Update() {
-		// Player trying to interact with something
-		if (Input.GetKeyDown(KeyCode.E)) {
-			// Will implement function later
-			Interact();
-		}
-	}
-
 	// Called every physics engine update
 	void FixedUpdate() {
+		if (target != null) {
+			transform.position = target.transform.position + targetOffset;
+		}
+
 		// Don't do anything if interacting with something
 		if (interacting) return;
 
@@ -117,26 +115,39 @@ public class SmallSwarm : MonoBehaviour {
 
 	public void OnTriggerStay(Collider other) {
 		if (target == null && Input.GetAxis("Interact") > 0) {
-			// Check what we collided with and see if we are actually able to interact with it.
-			target = other.gameObject;
-			if (other.tag == "RoomCamera") {
-				other.GetComponentInParent<RoomCamera>().turnedOn = false;
-			}
-			else if (other.tag == "RoomLight") {
-				other.GetComponentInParent<RoomLight>().turnedOn = false;
-			}
-			else {
-				target = null;
-			}
-
-			// If we did interact, then start our death timer.
-			if (target != null) {
-				InvokeRepeating("UpdateDisabledTimer", 0f, 1f);
-			}
+			Interact(other.gameObject);
 		}
 	}
 
-	void Interact() {
+	public void Interact(GameObject other) {
+		if (target != null)
+			return;
+		print("Interacting");
+		// Check what we collided with and see if we are actually able to interact with it.
+		target = other;
+		if (other.tag == "RoomCamera") {
+			other.GetComponentInParent<RoomCamera>().turnedOn = false;
+		}
+		else if (other.tag == "RoomLight") {
+			other.GetComponentInParent<RoomLight>().turnedOn = false;
+		}
+		else if (other.layer == enemyLayer) {
+		}
+		else {
+			target = null;
+		}
+
+		// If we did interact, then set our parent and start our death timer.
+		if (target != null) {
+			InvokeRepeating("UpdateDisabledTimer", 0f, 1f);
+			targetOffset = transform.position - target.transform.position;
+			Debug.LogFormat("Guard position: {0}, offset: {1}", target.transform.position, targetOffset);
+		}
+		else {
+			print("Destroying");
+			Destroy(gameObject);
+		}
+
 		// Camera control goes back to the scientist
 		GameObject.Find("MultipurposeCameraRig").GetComponent<AutoCam>().m_Target = scientistTrans;
 		Main.S.controlScientist = interacting = true;
@@ -156,7 +167,7 @@ public class SmallSwarm : MonoBehaviour {
 					target.GetComponentInParent<RoomLight>().turnedOn = true;
 				}
 				Main.S.HideInteractPopup(target);
-				
+
 				Destroy(gameObject);
 			}
 		}
