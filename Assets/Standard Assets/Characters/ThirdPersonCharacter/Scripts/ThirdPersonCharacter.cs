@@ -45,7 +45,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 
             // Get the swarm layer, and then invert it so it gets the layer mask
             // of all layers except the swarm layer
-            allInteractableLayers = ~LayerMask.GetMask("Swarm");
+            allInteractableLayers = ~(LayerMask.GetMask("Swarm") | LayerMask.GetMask("SmallSwarm"));
         }
 
 		public void Move(Vector3 move, bool crouch, bool jump)
@@ -115,7 +115,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 				float crouchRayLength = m_CapsuleHeight - m_Capsule.radius * k_Half;
 				if (tag == "Player" && Physics.SphereCast(crouchRay, m_Capsule.radius * k_Half, crouchRayLength, allInteractableLayers, QueryTriggerInteraction.Ignore))
 				{
-                    m_Crouching = true;
+   //                 m_Crouching = true;
 				}
 			}
 		}
