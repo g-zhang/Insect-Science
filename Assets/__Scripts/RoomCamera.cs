@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
-using UnityEngine.SceneManagement;
 
 public class RoomCamera : MonoBehaviour {
 	// Z (up/down) angle from where the camera is facing that the lines will point.
@@ -76,7 +74,7 @@ public class RoomCamera : MonoBehaviour {
 
 			if (hit.collider.tag == "Player") {
 				spotted = true;
-				SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+				Main.S.FadeOutAndRestart();
 			}
 		}
 		else

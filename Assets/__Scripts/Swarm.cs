@@ -53,7 +53,7 @@ public class Swarm : MonoBehaviour {
 
     void Update() {
         crouch = poi.gameObject.GetComponent<ThirdPersonCharacter>().m_Crouching;
-        if(Input.GetKeyDown(KeyCode.Q)) {
+        if(Input.GetAxis("Split") > 0f && GameObject.Find("MultipurposeCameraRig").GetComponent<AutoCam>().m_Target.tag != "SmallSwarm") {
             SpawnSubSwarm();
         }
         // Cancel invoke if at max charges

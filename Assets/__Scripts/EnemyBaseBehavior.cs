@@ -54,6 +54,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
 
     RigidbodyConstraints normalBody = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
     RigidbodyConstraints enableZBody = RigidbodyConstraints.FreezeRotation;
+    int sightLayerMask = ~(1 << 9 | 1 << 12);
 
     // Use this for initialization
     void Start () {
@@ -277,12 +278,14 @@ public class EnemyBaseBehavior : MonoBehaviour {
     /* Swarm interaction */
     void OnTriggerEnter(Collider other)
     {
+        Debug.DrawRay(other.gameObject.transform.position, Vector3.up * 5f, Color.green);
+        print(other.gameObject.tag);
         if (other.gameObject.tag == "SmallSwarm")
 		{
 			Main.S.ShowInteractPopup(gameObject, "Press E to Swarm Guard");
 			isInteractable = true;
             currPopupTime = InteractPopupTime;
-			hoverSwarm = other.gameObject.GetComponent<SmallSwarm>();
+			hoverSwarm = other.GetComponentInParent<SmallSwarm>();
         }
     }
 
@@ -290,8 +293,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
     {
         if (other.gameObject.tag == "SmallSwarm")
         {
-            float interact = Input.GetAxis("Interact");
-            if (interact > 0 && currState != EnemyState.swarmed)
+            if (Main.S.interact && currState != EnemyState.swarmed)
             {
                 Runaway();
                 currRunawayTime = RunawayTime;
@@ -356,7 +358,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
             bool lineOfSight = false;
             Ray visionray = new Ray(visionPos, targetDir);
             RaycastHit hit;
-            if(Physics.Raycast(visionray, out hit, sightRange))
+            if(Physics.Raycast(visionray, out hit, sightRange, sightLayerMask))
             {
                 if(hit.transform.tag == "Swarm")
                 {
@@ -406,7 +408,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
             bool lineOfSight = false;
             Ray visionray = new Ray(visionPos, targetDir);
             RaycastHit hit;
-            if (Physics.Raycast(visionray, out hit, sightRange))
+            if (Physics.Raycast(visionray, out hit, sightRange, sightLayerMask))
             {
                 if (hit.transform.tag == "Player")
                 {
