@@ -41,6 +41,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
     public Vector3 currTargetPos = Vector3.zero;
     public float currHP;
     public float currWaitTime = 0f;
+    public Vector3 currRotation = Vector3.zero;
     public float currRunawayTime = 0f;
 
     NavMeshAgent navagn;
@@ -48,6 +49,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
     protected Collider coll;
     Vector3 nextPoint;
     float nextWaitTime = 0f;
+    Vector3 nextPointRotation = Vector3.zero;
     protected Vector3 visionVector = Vector3.zero;
     public Vector3 visionPos = Vector3.zero;
 	SmallSwarm hoverSwarm;
@@ -100,6 +102,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
                 ipathIdx = 0;
                 SetNext(investigatePath[ipathIdx]);
                 navagn.destination = nextPoint;
+                currWaitTime = 0;
             }
             if(currTarget != AttackTarget.none && currState == EnemyState.normal)
             {
@@ -144,8 +147,18 @@ public class EnemyBaseBehavior : MonoBehaviour {
     //move to functions are using unity navmesh agent pathfinding
     public void SetNext(GameObject point)
     {
+        PatrolPoint npoint = point.GetComponent<PatrolPoint>();
         SetNext(point.transform.position);
-        nextWaitTime = point.GetComponent<PatrolPoint>().waitTime;
+        nextWaitTime = npoint.waitTime;
+        if(npoint.directions.Length > 0)
+        {
+            nextPointRotation = npoint.directions[0];
+            print(nextPointRotation);
+        } else
+        {
+            print("direction nuked");
+            nextPointRotation = Vector3.zero;
+        }
     }
 
     public void SetNext(Vector3 point)
@@ -174,7 +187,14 @@ public class EnemyBaseBehavior : MonoBehaviour {
         if(currWaitTime > 0)
         {
             navagn.updateRotation = false;
-            navagn.Stop();     
+            navagn.Stop();
+
+            //ROTATE
+            //print(body.transform.right);
+            if(currRotation != Vector3.zero)
+            {
+                body.transform.rotation = Quaternion.LookRotation(Vector3.Slerp(body.transform.forward, currRotation, RotationSpeed));
+            }     
 
             currWaitTime -= Time.deltaTime;
         }
@@ -189,6 +209,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
             if (ArrivedAt(nextPoint))
             {
                 currWaitTime = nextWaitTime;
+                currRotation = nextPointRotation;
                 patrolIndex = (patrolIndex + 1) % Path.Length;
                 SetNext(Path[patrolIndex]);
 
@@ -273,6 +294,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
         Vector3 runawayPos = body.transform.position + new Vector3(body.transform.forward.x, 0, 0) * RunawayDistance;
         SetNext(runawayPos);
         nextWaitTime = RunawayTime;
+        nextPointRotation = Vector3.zero;
         currWaitTime = 0f;
         navagn.destination = nextPoint;
     }
