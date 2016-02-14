@@ -1,15 +1,29 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class Scientist : MonoBehaviour {
 
 	public static Scientist S;
+    public int maxHP = 3;
+
+    [Header("Status")]
+    public int currHP;
 
 	bool usedDoor = false;
 
 	void Awake() {
 		S = this;
+        currHP = maxHP;
 	}
+
+    void Update()
+    {
+        if (currHP <= 0)
+        {
+            Main.S.FadeOutAndExit(SceneManager.GetActiveScene().name);
+        }
+    }
 
 	public void OnTriggerEnter(Collider other) {
 		var door = other.GetComponentInParent<HallDoor>();
@@ -22,7 +36,7 @@ public class Scientist : MonoBehaviour {
 		}
 		if (other.tag == "EndZone") {
 			Main.S.ShowInteractPopup(other.gameObject, "Press E to retrieve the launch codes");
-	}
+	    }
 	}
 
 	void OnTriggerStay(Collider other) {
