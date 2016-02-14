@@ -42,6 +42,23 @@ public class Main : MonoBehaviour {
 		get { return Input.GetAxis("Interact") > 0f && !ignoreInteraction; }
 	}
 
+	float endSplitTime = 0f;
+	public bool ignoreSplit {
+		get { return endSplitTime > Time.time; }
+		set {
+			if (value) {
+				endSplitTime = Time.time + 0.5f;
+			}
+			else {
+				endSplitTime = 0f;
+			}
+		}
+	}
+
+	public bool split {
+		get { return Input.GetAxis("Split") > 0f && !ignoreSplit; }
+	}
+
 	// Holds all the currently shown popups.  There can be multiple, so this is a Dictionary.
 	Dictionary<GameObject, Text> interactTexts = new Dictionary<GameObject, Text>();
 	GameObject interactCanvas;

@@ -46,19 +46,17 @@ public class SmallSwarm : MonoBehaviour {
 		Physics.IgnoreCollision(sc, Swarm.S.GetComponent<SphereCollider>());
 	}
 
-	public void LateUpdate() {
-		if (Main.S.interact && target == null) {
-			Destroy(gameObject);
-			// Camera control goes back to the scientist
-			GameObject.Find("MultipurposeCameraRig").GetComponent<AutoCam>().m_Target = scientistTrans;
-			Main.S.controlScientist = true;
-		}
-	}
-
 	// Called every physics engine update
 	void FixedUpdate() {
 		if (target != null) {
 			transform.position = target.transform.position + targetOffset;
+		}
+		if (Main.S.split && target == null) {
+			Main.S.ignoreSplit = true;
+			Destroy(gameObject);
+			// Camera control goes back to the scientist
+			GameObject.Find("MultipurposeCameraRig").GetComponent<AutoCam>().m_Target = scientistTrans;
+			Main.S.controlScientist = true;
 		}
 
 		// Don't do anything if interacting with something
