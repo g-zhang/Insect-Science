@@ -58,7 +58,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-		sightLayerMask = LayerMask.GetMask("Default", "Scientist", "Swarm", "Ground");
+		sightLayerMask = LayerMask.GetMask("Default", "Scientist", "Ground");
 
         currHP = MaxHP;
         body = GetComponent<Rigidbody>();
