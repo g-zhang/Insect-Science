@@ -37,6 +37,9 @@ public class Scientist : MonoBehaviour {
 		if (other.tag == "EndZone") {
 			Main.S.ShowInteractPopup(other.gameObject, "Press E to retrieve the launch codes");
 	    }
+        else if (other.tag == "EnemyProjectile") {
+            Main.S.FadeOutAndRestart();
+        }
 	}
 
 	void OnTriggerStay(Collider other) {
