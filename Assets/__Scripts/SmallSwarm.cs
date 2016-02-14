@@ -110,10 +110,13 @@ public class SmallSwarm : MonoBehaviour {
 		else if (other.tag == "KeypadTrigger") {
 			Main.S.ShowInteractPopup(other.gameObject, "Press E to short-circuit the keypad");
 		}
+		else if (other.gameObject.layer == enemyLayer) {
+			Main.S.ShowInteractPopup(other.gameObject, "Press E to swarm guard");
+		}
 	}
 
 	public void OnTriggerExit(Collider other) {
-		if (other.tag == "RoomCamera" || other.tag == "RoomLight" || other.tag == "KeypadTrigger") {
+		if (other.tag == "RoomCamera" || other.tag == "RoomLight" || other.tag == "KeypadTrigger" || other.gameObject.layer == enemyLayer) {
 			Main.S.HideInteractPopup(other.gameObject);
 
 		}
@@ -137,6 +140,7 @@ public class SmallSwarm : MonoBehaviour {
 			other.GetComponentInParent<RoomLight>().turnedOn = false;
 		}
 		else if (other.layer == enemyLayer) {
+			other.GetComponent<EnemyBaseBehavior>().swarmed = true;
 		}
 		else {
 			target = null;
@@ -169,6 +173,9 @@ public class SmallSwarm : MonoBehaviour {
 				}
 				else if (target.tag == "RoomLight") {
 					target.GetComponentInParent<RoomLight>().turnedOn = true;
+				}
+				else if (target.layer == enemyLayer) {
+					target.GetComponent<EnemyBaseBehavior>().swarmed = true;
 				}
 				Main.S.HideInteractPopup(target);
 

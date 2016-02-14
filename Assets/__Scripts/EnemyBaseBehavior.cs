@@ -297,10 +297,22 @@ public class EnemyBaseBehavior : MonoBehaviour {
         nextPointRotation = Vector3.zero;
         currWaitTime = 0f;
         navagn.destination = nextPoint;
-    }
+	}
 
-    /* Swarm interaction */
-    void OnTriggerEnter(Collider other)
+	public bool swarmed {
+		get { return currState == EnemyState.swarmed; }
+		set {
+			if (value) {
+				// start running away
+			}
+			else {
+				// stop running away
+			}
+		}
+	}
+
+	/* Swarm interaction */
+	void OnTriggerEnter(Collider other)
     {
         Debug.DrawRay(other.gameObject.transform.position, Vector3.up * 5f, Color.green);
         print(other.gameObject.tag);

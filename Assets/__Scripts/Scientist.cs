@@ -25,7 +25,7 @@ public class Scientist : MonoBehaviour {
         }
     }
 
-	public void OnTriggerEnter(Collider other) {
+	void TryShowPopup(GameObject other) {
 		var door = other.GetComponentInParent<HallDoor>();
 		if (door != null) {
 			Main.S.ShowInteractPopup(door.gameObject, "Press E to use the hallway");
@@ -36,13 +36,41 @@ public class Scientist : MonoBehaviour {
 		}
 		if (other.tag == "EndZone") {
 			Main.S.ShowInteractPopup(other.gameObject, "Press E to retrieve the launch codes");
-	    }
-        else if (other.tag == "EnemyProjectile") {
-            Main.S.FadeOutAndRestart();
-        }
+		}
+		else if (other.tag == "EnemyProjectile") {
+			Main.S.FadeOutAndRestart();
+		}
 	}
 
+	void TryHidePopup(GameObject other) {
+		var door = other.GetComponentInParent<HallDoor>();
+		if (door != null) {
+			Main.S.HideInteractPopup(door.gameObject);
+		}
+		var elevator = other.GetComponent<ElevatorTrigger>();
+		if (elevator != null) {
+			Main.S.HideInteractPopup(elevator.gameObject);
+		}
+		if (tag == "EndZone") {
+			Main.S.HideInteractPopup(other.gameObject);
+		}
+	}
+
+	public void OnTriggerEnter(Collider other) {
+		TryShowPopup(other.gameObject);
+	}
+
+	bool wasControllingScientist;
 	void OnTriggerStay(Collider other) {
+		if (wasControllingScientist != Main.S.controlScientist) {
+			if (Main.S.controlScientist) {
+				TryShowPopup(other.gameObject);
+			}
+			else {
+				TryHidePopup(other.gameObject);
+			}
+		}
+		wasControllingScientist = Main.S.controlScientist;
 		if (!Main.S.controlScientist) {
 			return;
 		}
@@ -74,16 +102,6 @@ public class Scientist : MonoBehaviour {
 	}
 
 	public void OnTriggerExit(Collider other) {
-		var door = other.GetComponentInParent<HallDoor>();
-		if (door != null) {
-			Main.S.HideInteractPopup(door.gameObject);
-		}
-		var elevator = other.GetComponent<ElevatorTrigger>();
-		if (elevator != null) {
-			Main.S.HideInteractPopup(elevator.gameObject);
-		}
-		if (tag == "EndZone") {
-			Main.S.HideInteractPopup(other.gameObject);
-		}
+		TryHidePopup(other.gameObject);
 	}
 }
