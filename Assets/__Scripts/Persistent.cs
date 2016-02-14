@@ -21,6 +21,8 @@ public class Persistent : MonoBehaviour {
 		}
 	}
 
+	public string nextSceneName = "Level_Select";
+
 	// One-time initialization.  Awake and Start will be called each time a new scene starts.
 	void Init() {
 	}

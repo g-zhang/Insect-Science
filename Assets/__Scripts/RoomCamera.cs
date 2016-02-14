@@ -76,7 +76,7 @@ public class RoomCamera : MonoBehaviour {
 
 			if (hit.collider.tag == "Player") {
 				spotted = true;
-				SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+				Main.S.FadeOutAndExit(SceneManager.GetActiveScene().name);
 			}
 		}
 		else

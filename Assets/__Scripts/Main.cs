@@ -1,18 +1,30 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Main : MonoBehaviour {
+	enum FadeState {
+		None,
+		In,
+		Out,
+	}
+
 	static public Main S;                   // Main Singleton.
 
 	public GameObject interactTextPrefab;   // Prefab for the interaction popup text.
-	public GameObject flyChargePrefab;
+	public GameObject flyChargePrefab;      // Prefab for the fly charge image.
+	public Sprite screenFadeSprite;			// Sprite for the screen fade image.
 	public bool controlScientist = true;    // The player starts the game controlling the scientist.
 
 	// Holds all the currently shown popups.  There can be multiple, so this is a Dictionary.
 	Dictionary<GameObject, Text> interactTexts = new Dictionary<GameObject, Text>();
 	GameObject interactCanvas;
+	GameObject dimmer;
 	List<GameObject> flyChargeObjs = new List<GameObject>();
+
+	float fadeStartTime;
+	FadeState fadeState = FadeState.In;
 
 	public int flyCharges {
 		get { return flyChargeObjs.Count; }
@@ -40,10 +52,55 @@ public class Main : MonoBehaviour {
 		interactCanvas.AddComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
 		interactCanvas.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
 
+		var dimCanvas = new GameObject("DimCanvas");
+		dimCanvas.AddComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
+		dimCanvas.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+
+		dimmer = new GameObject("ScreenDimmer");
+		dimmer.transform.SetParent(dimCanvas.transform, false);
+		dimmer.AddComponent<Image>().sprite = screenFadeSprite;
+		dimmer.GetComponent<Image>().rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.width);
+		dimmer.GetComponent<Image>().rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.height);
+
 		flyCharges = 3;
+
+		FadeIn();
 	}
 
 	void Update() {
+		if (fadeState != FadeState.None) {
+			const float fadeDuration = 0.5f;
+
+			bool doneFading = Time.time > fadeStartTime + fadeDuration;
+			float alpha = 0f;
+			if (fadeState == FadeState.In) {
+				if (doneFading) {
+					alpha = 0f;
+				}
+				else {
+					alpha = 1f - (Time.time - fadeStartTime) / fadeDuration;
+				}
+			}
+			else if (fadeState == FadeState.Out) {
+				if (doneFading) {
+					alpha = 1f;
+					if (nextSceneName != null) {
+						SceneManager.LoadScene(nextSceneName);
+					}
+				}
+				else {
+					alpha = (Time.time - fadeStartTime) / fadeDuration;
+				}
+			}
+
+			if (fadeState != FadeState.None) {
+				dimmer.GetComponent<Image>().color = new Color(1f, 1f, 1f, alpha);
+			}
+			if (doneFading) {
+				fadeState = FadeState.None;
+			}
+		}
+
 		foreach (var kvp in interactTexts) {
 			// Place the text next to the object it is anchored to.
 			var screenPos = Camera.main.WorldToScreenPoint(kvp.Key.transform.position) + new Vector3(0f, -20f);
@@ -92,5 +149,17 @@ public class Main : MonoBehaviour {
 			Destroy(interactTexts[anchor].gameObject);
 			interactTexts.Remove(anchor);
 		}
+	}
+
+	void FadeIn() {
+		fadeState = FadeState.In;
+		fadeStartTime = Time.time;
+	}
+
+	string nextSceneName;
+	public void FadeOutAndExit(string nextSceneName) {
+		fadeState = FadeState.Out;
+		this.nextSceneName = nextSceneName;
+		fadeStartTime = Time.time;
 	}
 }

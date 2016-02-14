@@ -16,6 +16,7 @@ public class SmallSwarm : MonoBehaviour {
 	public Transform scientistTrans;
 	// Set in start
 	public float moveSpeed;
+	public float moveAccel;
 	public float maxDistFromScientist;
 	public float enemyDistractionTime;
 	// Set dynamically
@@ -34,7 +35,8 @@ public class SmallSwarm : MonoBehaviour {
 		sc = transform.Find("Collider").GetComponent<SphereCollider>();
 
 		// Set variables
-		moveSpeed = Swarm.S.moveSpeed;
+		moveSpeed = 2 * Swarm.S.moveSpeed;
+		moveAccel = moveSpeed * 2;
 		maxDistFromScientist = Swarm.S.maxDistFromScientist;
 		enemyDistractionTime = Swarm.S.enemyDistractionTime;
 		scientistTrans = Scientist.S.transform; // Used when camera switches back to the scientist
@@ -56,32 +58,22 @@ public class SmallSwarm : MonoBehaviour {
 		// Get velocity vector
 		Vector3 vel = rigid.velocity;
 
-		// Y-Axis movement
-		bool up = Input.GetKey(KeyCode.W);
-		bool down = Input.GetKey(KeyCode.S);
+		vel.x = moveSpeed * Input.GetAxis("Horizontal");
+		vel.y = moveSpeed * Input.GetAxis("Vertical");
+		if (vel.magnitude > moveSpeed)
+			vel = vel.normalized * moveSpeed;
 
-		if (up && !down && !tooFarAway(Direction.Up)) {
-			vel.y = moveSpeed; // Going up
-		}
-		else if (!up && down && !tooFarAway(Direction.Down)) {
-			vel.y = -moveSpeed; // Going down
-		}
-		else vel.y = 0f; // No y-axis movement
-
-		// X-Axis movement
-		bool right = Input.GetKey(KeyCode.D);
-		bool left = Input.GetKey(KeyCode.A);
-
-		if (right && !left && !tooFarAway(Direction.Right)) {
-			vel.x = moveSpeed; // Going right
-		}
-		else if (!right && left && !tooFarAway(Direction.Left)) {
-			vel.x = -moveSpeed; // Going left
-		}
-		else vel.x = 0f; // No x-axis movement
+		if (tooFarAway(Direction.Left) && vel.x < 0f)
+			vel.x = 0f;
+		else if (tooFarAway(Direction.Right) && vel.x > 0f)
+			vel.x = 0f;
+		if (tooFarAway(Direction.Up) && vel.y > 0f)
+			vel.y = 0f;
+		else if (tooFarAway(Direction.Down) && vel.y < 0f)
+			vel.y = 0f;
 
 		// Set velocity
-		rigid.velocity = vel.normalized * moveSpeed;
+		rigid.velocity = vel;
 	}
 
 	bool tooFarAway(Direction testDirection) {
@@ -147,6 +139,7 @@ public class SmallSwarm : MonoBehaviour {
 			targetOffset = transform.position - target.transform.position;
 		}
 		else {
+			OnTriggerExit(other.GetComponent<Collider>());
 			Destroy(gameObject);
 		}
 
