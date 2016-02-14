@@ -27,14 +27,12 @@ public class Projectile : MonoBehaviour {
         }
 	}
 
-    void OnTriggerExit(Collider coll)
+    void OnTriggerEnter(Collider coll)
     {
         if(coll.tag == "Player")
         {
             Scientist.S.currHP -= Damage;
         }
-
-        print(coll.gameObject.tag);
         Destroy(this.gameObject);
     }
 }
