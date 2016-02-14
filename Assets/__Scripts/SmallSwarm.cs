@@ -173,7 +173,7 @@ public class SmallSwarm : MonoBehaviour {
 					target.GetComponentInParent<RoomLight>().turnedOn = true;
 				}
 				else if (target.layer == enemyLayer) {
-					target.GetComponent<EnemyBaseBehavior>().swarmed = true;
+					target.GetComponent<EnemyBaseBehavior>().swarmed = false;
 				}
 				Main.S.HideInteractPopup(target);
 
