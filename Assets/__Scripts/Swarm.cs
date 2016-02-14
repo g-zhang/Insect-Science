@@ -131,6 +131,9 @@ public class Swarm : MonoBehaviour {
         // Increment charges and adjust size
         charges++;
         AdjustSwarmSize();
+
+		if (charges < maxCharges)
+			Invoke("RegenerateSwarm", swarmRegenerationRate);
     }
 
 }
