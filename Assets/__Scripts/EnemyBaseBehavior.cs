@@ -278,6 +278,8 @@ public class EnemyBaseBehavior : MonoBehaviour {
     /* Swarm interaction */
     void OnTriggerEnter(Collider other)
     {
+        Debug.DrawRay(other.gameObject.transform.position, Vector3.up * 5f, Color.green);
+        print(other.gameObject.tag);
         if (other.gameObject.tag == "SmallSwarm")
 		{
 			Main.S.ShowInteractPopup(gameObject, "Press E to Swarm Guard");
