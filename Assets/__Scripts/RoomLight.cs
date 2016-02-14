@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class RoomLight : MonoBehaviour {
 	Renderer dimmer;
+    // Put lights in Inspector
+    public List<Light> lights;
 
 	[SerializeField]
 	bool _turnedOn = true;
@@ -12,8 +15,11 @@ public class RoomLight : MonoBehaviour {
 		}
 		set {
 			_turnedOn = value;
+            foreach (var light in lights) {
+                light.enabled = _turnedOn;
+            }
 
-			dimmer.enabled = !_turnedOn;
+            dimmer.enabled = !_turnedOn;
 		}
 	}
 
