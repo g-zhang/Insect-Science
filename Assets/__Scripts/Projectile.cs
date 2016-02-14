@@ -26,9 +26,11 @@ public class Projectile : MonoBehaviour {
         }
 	}
 
-    void OnTriggerExit(Collider coll)
+    void OnTriggerEnter(Collider coll)
     {
-        print(coll.gameObject.tag);
+		if (coll.tag == "Player") {
+			Main.S.FadeOutAndRestart();
+		}
         Destroy(this.gameObject);
     }
 }
