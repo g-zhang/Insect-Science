@@ -27,7 +27,7 @@ public class Scientist : MonoBehaviour {
 			return;
 		}
 		var door = other.GetComponentInParent<HallDoor>();
-		if (door != null && Input.GetAxis("Interact") > 0 && !usedDoor) {
+		if (door != null && Input.GetAxis("Interact") > 0 && !usedDoor && Main.S.controlScientist) {
 			var diff = transform.position - other.transform.position;
 			var swarmDiff = Swarm.S.transform.position - transform.position;
 			transform.position = diff + door.linkedDoor.transform.position + new Vector3(0f, 0.1f, 0f);
@@ -37,7 +37,7 @@ public class Scientist : MonoBehaviour {
 		}
 
 		var elevator = other.GetComponent<ElevatorTrigger>();
-		if (elevator != null && Input.GetAxis("Interact") > 0 && !usedDoor) {
+		if (elevator != null && Input.GetAxis("Interact") > 0 && !usedDoor && Main.S.controlScientist) {
 			Vector3 sciPos = transform.position;
 			Vector3 swarmPos = Swarm.S.transform.position;
 			sciPos.y = elevator.destination.transform.position.y + 0.1f;
