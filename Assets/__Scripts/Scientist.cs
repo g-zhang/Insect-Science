@@ -5,14 +5,25 @@ using UnityEngine.SceneManagement;
 public class Scientist : MonoBehaviour {
 
 	public static Scientist S;
+    public int MaxHP = 1;
 
     [Header("Status")]
+    public int currHP;
 
 	bool usedDoor = false;
 
 	void Awake() {
 		S = this;
+        currHP = MaxHP;
 	}
+
+    void Update()
+    {
+        if(currHP <= 0)
+        {
+            Main.S.FadeOutAndRestart();
+        }
+    }
 
 	public void OnTriggerEnter(Collider other) {
 		var door = other.GetComponentInParent<HallDoor>();
