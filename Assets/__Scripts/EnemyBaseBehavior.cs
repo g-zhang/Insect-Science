@@ -283,7 +283,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
 			Main.S.ShowInteractPopup(gameObject, "Press E to Swarm Guard");
 			isInteractable = true;
             currPopupTime = InteractPopupTime;
-			hoverSwarm = other.gameObject.GetComponent<SmallSwarm>();
+			hoverSwarm = other.GetComponentInParent<SmallSwarm>();
         }
     }
 
@@ -291,8 +291,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
     {
         if (other.gameObject.tag == "SmallSwarm")
         {
-            float interact = Input.GetAxis("Interact");
-            if (interact > 0 && currState != EnemyState.swarmed)
+            if (Main.S.interact && currState != EnemyState.swarmed)
             {
                 Runaway();
                 currRunawayTime = RunawayTime;

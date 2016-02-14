@@ -15,7 +15,32 @@ public class Main : MonoBehaviour {
 	public GameObject interactTextPrefab;   // Prefab for the interaction popup text.
 	public GameObject flyChargePrefab;      // Prefab for the fly charge image.
 	public Sprite screenFadeSprite;			// Sprite for the screen fade image.
-	public bool controlScientist = true;    // The player starts the game controlling the scientist.
+
+	bool _controlScientist = true;    // The player starts the game controlling the scientist.
+	public bool controlScientist {
+		get { return _controlScientist; }
+		set {
+			_controlScientist = value;
+			ignoreInteraction = true;
+		}
+	}
+
+	float endIgnoreInteractionTime = 0f;
+	public bool ignoreInteraction {
+		get { return endIgnoreInteractionTime > Time.time; }
+		set {
+			if (value) {
+				endIgnoreInteractionTime = Time.time + 0.5f;
+			}
+			else {
+				endIgnoreInteractionTime = 0f;
+			}
+		}
+	}
+
+	public bool interact {
+		get { return Input.GetAxis("Interact") > 0f && !ignoreInteraction; }
+	}
 
 	// Holds all the currently shown popups.  There can be multiple, so this is a Dictionary.
 	Dictionary<GameObject, Text> interactTexts = new Dictionary<GameObject, Text>();

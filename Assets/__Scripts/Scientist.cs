@@ -29,33 +29,31 @@ public class Scientist : MonoBehaviour {
 		if (!Main.S.controlScientist) {
 			return;
 		}
-		if (Input.GetAxis("Interact") > 0f) {
-		var door = other.GetComponentInParent<HallDoor>();
-			if (door != null && !usedDoor) {
-			var diff = transform.position - other.transform.position;
-			var swarmDiff = Swarm.S.transform.position - transform.position;
-			transform.position = diff + door.linkedDoor.transform.position + new Vector3(0f, 0.1f, 0f);
-			Swarm.S.transform.position = transform.position + swarmDiff;
-			usedDoor = true;
-			Invoke("ResetUsedDoor", 0.5f);
-		}
+		if (Main.S.interact) {
+			var door = other.GetComponentInParent<HallDoor>();
+				if (door != null && !usedDoor) {
+				var diff = transform.position - other.transform.position;
+				var swarmDiff = Swarm.S.transform.position - transform.position;
+				transform.position = diff + door.linkedDoor.transform.position + new Vector3(0f, 0.1f, 0f);
+				Swarm.S.transform.position = transform.position + swarmDiff;
+				Main.S.ignoreInteraction = true;
+			}
 
-		var elevator = other.GetComponent<ElevatorTrigger>();
-			if (elevator != null && !usedDoor) {
-			Vector3 sciPos = transform.position;
-			Vector3 swarmPos = Swarm.S.transform.position;
-			sciPos.y = elevator.destination.transform.position.y + 0.1f;
-			swarmPos.y = elevator.destination.transform.position.y + 1.1f;
-			transform.position = sciPos;
-			Swarm.S.transform.position = swarmPos;
-			usedDoor = true;
-			Invoke("ResetUsedDoor", 0.5f);
-		}
+			var elevator = other.GetComponent<ElevatorTrigger>();
+				if (elevator != null && !usedDoor) {
+				Vector3 sciPos = transform.position;
+				Vector3 swarmPos = Swarm.S.transform.position;
+				sciPos.y = elevator.destination.transform.position.y + 0.1f;
+				swarmPos.y = elevator.destination.transform.position.y + 1.1f;
+				transform.position = sciPos;
+				Swarm.S.transform.position = swarmPos;
+				Main.S.ignoreInteraction = true;
+			}
 
 			if (other.tag == "EndZone") {
 				Main.S.FadeOutAndExit(Persistent.S.nextSceneName);
 			}
-	}
+		}
 	}
 
 	public void OnTriggerExit(Collider other) {
@@ -70,9 +68,5 @@ public class Scientist : MonoBehaviour {
 		if (tag == "EndZone") {
 			Main.S.HideInteractPopup(other.gameObject);
 		}
-	}
-
-	void ResetUsedDoor() {
-		usedDoor = false;
 	}
 }

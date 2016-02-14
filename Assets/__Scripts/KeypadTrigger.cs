@@ -11,8 +11,7 @@ public class KeypadTrigger : MonoBehaviour {
     void OnTriggerStay(Collider other) {
         if(other.gameObject.tag == "SmallSwarm")
         {
-            float interact = Input.GetAxis("Interact");
-            if (interact > 0 && active) {
+            if (Main.S.interact && active) {
                 DeactivateDoor();
                 Destroy(other.gameObject);
                 Main.S.HideInteractPopup(this.gameObject);

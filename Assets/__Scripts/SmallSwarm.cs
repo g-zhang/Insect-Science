@@ -111,7 +111,7 @@ public class SmallSwarm : MonoBehaviour {
 	}
 
 	public void OnTriggerStay(Collider other) {
-		if (target == null && Input.GetAxis("Interact") > 0) {
+		if (target == null && Main.S.interact) {
 			Interact(other.gameObject);
 		}
 	}
