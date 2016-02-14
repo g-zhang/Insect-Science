@@ -183,8 +183,15 @@ public class Main : MonoBehaviour {
 
 	string nextSceneName;
 	public void FadeOutAndExit(string nextSceneName) {
+		if (fadeState == FadeState.Out) {
+			return;
+		}
 		fadeState = FadeState.Out;
 		this.nextSceneName = nextSceneName;
 		fadeStartTime = Time.time;
+	}
+
+	public void FadeOutAndRestart() {
+		FadeOutAndExit(SceneManager.GetActiveScene().name);
 	}
 }

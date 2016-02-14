@@ -41,9 +41,18 @@ public class SmallSwarm : MonoBehaviour {
 		enemyDistractionTime = Swarm.S.enemyDistractionTime;
 		scientistTrans = Scientist.S.transform; // Used when camera switches back to the scientist
 												// and to calculate the scientist's position
-        // Ignore collisions with the scientist                       
+												// Ignore collisions with the scientist                       
 		Physics.IgnoreCollision(sc, Scientist.S.GetComponent<CapsuleCollider>());
 		Physics.IgnoreCollision(sc, Swarm.S.GetComponent<SphereCollider>());
+	}
+
+	public void LateUpdate() {
+		if (Main.S.interact && target == null) {
+			Destroy(gameObject);
+			// Camera control goes back to the scientist
+			GameObject.Find("MultipurposeCameraRig").GetComponent<AutoCam>().m_Target = scientistTrans;
+			Main.S.controlScientist = true;
+		}
 	}
 
 	// Called every physics engine update
@@ -92,21 +101,21 @@ public class SmallSwarm : MonoBehaviour {
 	}
 
 	public void OnTriggerEnter(Collider other) {
-	   	if (other.tag == "RoomCamera") {
+		if (other.tag == "RoomCamera") {
 			Main.S.ShowInteractPopup(other.gameObject, "Press E to disable camera");
 		}
 		else if (other.tag == "RoomLight") {
 			Main.S.ShowInteractPopup(other.gameObject, "Press E to disable lights");
 		}
-        else if (other.tag == "KeypadTrigger") {
-            Main.S.ShowInteractPopup(other.gameObject, "Press E to short-circuit the keypad");
-        }
+		else if (other.tag == "KeypadTrigger") {
+			Main.S.ShowInteractPopup(other.gameObject, "Press E to short-circuit the keypad");
+		}
 	}
 
 	public void OnTriggerExit(Collider other) {
 		if (other.tag == "RoomCamera" || other.tag == "RoomLight" || other.tag == "KeypadTrigger") {
 			Main.S.HideInteractPopup(other.gameObject);
-           
+
 		}
 	}
 
