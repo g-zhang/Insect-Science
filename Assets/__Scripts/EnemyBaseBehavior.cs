@@ -54,10 +54,12 @@ public class EnemyBaseBehavior : MonoBehaviour {
 
     RigidbodyConstraints normalBody = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
     RigidbodyConstraints enableZBody = RigidbodyConstraints.FreezeRotation;
-    int sightLayerMask = ~(1 << 9 | 1 << 12);
+    int sightLayerMask;
 
     // Use this for initialization
     void Start () {
+		sightLayerMask = LayerMask.GetMask("Default", "Scientist", "Swarm", "Ground");
+
         currHP = MaxHP;
         body = GetComponent<Rigidbody>();
         navagn = GetComponent<NavMeshAgent>();
@@ -358,7 +360,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
             bool lineOfSight = false;
             Ray visionray = new Ray(visionPos, targetDir);
             RaycastHit hit;
-            if(Physics.Raycast(visionray, out hit, sightRange, sightLayerMask))
+            if(Physics.Raycast(visionray, out hit, sightRange, sightLayerMask, QueryTriggerInteraction.Ignore))
             {
                 if(hit.transform.tag == "Swarm")
                 {
@@ -408,7 +410,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
             bool lineOfSight = false;
             Ray visionray = new Ray(visionPos, targetDir);
             RaycastHit hit;
-            if (Physics.Raycast(visionray, out hit, sightRange, sightLayerMask))
+            if (Physics.Raycast(visionray, out hit, sightRange, sightLayerMask, QueryTriggerInteraction.Ignore))
             {
                 if (hit.transform.tag == "Player")
                 {
