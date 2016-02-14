@@ -119,13 +119,10 @@ public class EnemyBaseBehavior : MonoBehaviour {
             }
         } else if(currState == EnemyState.swarmed)
         {
-            if(currRunawayTime > 0)
+            Patrol(patrolPath);
+            if (currTarget != AttackTarget.none)
             {
-                Patrol(patrolPath);
-                currRunawayTime -= Time.deltaTime;
-            } else
-            {
-                currState = EnemyState.normal;
+                currState = EnemyState.attacking;
                 SetNext(patrolPath[patrolIndex]);
                 navagn.destination = nextPoint;
                 currWaitTime = 0;
@@ -153,10 +150,8 @@ public class EnemyBaseBehavior : MonoBehaviour {
         if(npoint.directions.Length > 0)
         {
             nextPointRotation = npoint.directions[0];
-            print(nextPointRotation);
         } else
         {
-            print("direction nuked");
             nextPointRotation = Vector3.zero;
         }
     }
@@ -303,52 +298,60 @@ public class EnemyBaseBehavior : MonoBehaviour {
 		get { return currState == EnemyState.swarmed; }
 		set {
 			if (value) {
-				// start running away
-			}
-			else {
-				// stop running away
-			}
-		}
-	}
-
-	/* Swarm interaction */
-	void OnTriggerEnter(Collider other)
-    {
-        Debug.DrawRay(other.gameObject.transform.position, Vector3.up * 5f, Color.green);
-        print(other.gameObject.tag);
-        if (other.gameObject.tag == "SmallSwarm")
-		{
-			Main.S.ShowInteractPopup(gameObject, "Press E to Swarm Guard");
-			isInteractable = true;
-            currPopupTime = InteractPopupTime;
-			hoverSwarm = other.GetComponentInParent<SmallSwarm>();
-        }
-    }
-
-    void OnTriggerStay(Collider other)
-    {
-        if (other.gameObject.tag == "SmallSwarm")
-        {
-            if (Main.S.interact && currState != EnemyState.swarmed)
-            {
+                // start running away
+                
                 Runaway();
                 currRunawayTime = RunawayTime;
                 currState = EnemyState.swarmed;
-                hoverSwarm.Interact(gameObject);
-                hoverSwarm = null;
             }
-        }
-    }
+			else {
+                // stop running away
+                currState = EnemyState.normal;
+                SetNext(patrolPath[patrolIndex]);
+                navagn.destination = nextPoint;
+                currWaitTime = 0;
+            }
+		}
+	}
 
-    void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.tag == "SmallSwarm")
-        {
-            Main.S.HideInteractPopup(gameObject);
-            hoverSwarm = null;
-            isInteractable = false;
-        }
-    }
+	///* Swarm interaction */
+	//void OnTriggerEnter(Collider other)
+ //   {
+ //       Debug.DrawRay(other.gameObject.transform.position, Vector3.up * 5f, Color.green);
+ //       print(other.gameObject.tag);
+ //       if (other.gameObject.tag == "SmallSwarm")
+	//	{
+	//		Main.S.ShowInteractPopup(gameObject, "Press E to Swarm Guard");
+	//		isInteractable = true;
+ //           currPopupTime = InteractPopupTime;
+	//		hoverSwarm = other.GetComponentInParent<SmallSwarm>();
+ //       }
+ //   }
+
+ //   void OnTriggerStay(Collider other)
+ //   {
+ //       if (other.gameObject.tag == "SmallSwarm")
+ //       {
+ //           if (Main.S.interact && currState != EnemyState.swarmed)
+ //           {
+ //               Runaway();
+ //               currRunawayTime = RunawayTime;
+ //               currState = EnemyState.swarmed;
+ //               hoverSwarm.Interact(gameObject);
+ //               hoverSwarm = null;
+ //           }
+ //       }
+ //   }
+
+ //   void OnTriggerExit(Collider other)
+ //   {
+ //       if (other.gameObject.tag == "SmallSwarm")
+ //       {
+ //           Main.S.HideInteractPopup(gameObject);
+ //           hoverSwarm = null;
+ //           isInteractable = false;
+ //       }
+ //   }
 
    // void OnInteractUpdate()
    // {

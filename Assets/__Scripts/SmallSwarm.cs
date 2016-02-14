@@ -141,7 +141,8 @@ public class SmallSwarm : MonoBehaviour {
 			other.GetComponent<EnemyBaseBehavior>().swarmed = true;
 		}
 		else {
-			target = null;
+            target = null;
+            return;
 		}
 
 		// If we did interact, then set our parent and start our death timer.
@@ -149,10 +150,10 @@ public class SmallSwarm : MonoBehaviour {
 			InvokeRepeating("UpdateDisabledTimer", 0f, 1f);
 			targetOffset = transform.position - target.transform.position;
 		}
-		else {
-			OnTriggerExit(other.GetComponent<Collider>());
-			Destroy(gameObject);
-		}
+        else
+        {
+            Debug.Assert(false);
+        }
 
 		// Camera control goes back to the scientist
 		GameObject.Find("MultipurposeCameraRig").GetComponent<AutoCam>().m_Target = scientistTrans;
