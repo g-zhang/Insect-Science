@@ -54,6 +54,7 @@ public class SmallSwarm : MonoBehaviour {
 		if (Main.S.split && target == null) {
 			Main.S.ignoreSplit = true;
 			Destroy(gameObject);
+			Swarm.S.RegenerateSwarm();
 			// Camera control goes back to the scientist
 			GameObject.Find("MultipurposeCameraRig").GetComponent<AutoCam>().m_Target = scientistTrans;
 			Main.S.controlScientist = true;

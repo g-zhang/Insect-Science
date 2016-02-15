@@ -129,13 +129,15 @@ public class Swarm : MonoBehaviour {
         GameObject.Find("MultipurposeCameraRig").GetComponent<AutoCam>().m_Target = go.transform;
     }
 
-    void RegenerateSwarm() {
-        // Increment charges and adjust size
-        charges++;
-        AdjustSwarmSize();
+    public void RegenerateSwarm() {
+		if (charges < maxCharges) {
+			// Increment charges and adjust size
+			charges++;
+			AdjustSwarmSize();
 
-		if (charges < maxCharges)
-			Invoke("RegenerateSwarm", swarmRegenerationRate);
-    }
-
+			if (charges < maxCharges && !IsInvoking("RegenerateSwarm")) {
+				Invoke("RegenerateSwarm", swarmRegenerationRate);
+			}
+		}
+	}
 }
