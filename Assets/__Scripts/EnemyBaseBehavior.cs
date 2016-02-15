@@ -18,6 +18,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
     public float sightAngle = 45f;
     public float visionPeriphal = 5f;
     public float attackingStayTime = 2f; //time the guard will stay there after seeing the player
+    public LineRenderer sightLineObj;
 
     [Header("Swarmed State Settings")]
     public float RunawayDistance = 10f;
@@ -73,13 +74,17 @@ public class EnemyBaseBehavior : MonoBehaviour {
         {
             SetNext(patrolPath[patrolIndex]);
         }
-	}
+    }
 	
 	// Update is called once per frame
 	void Update () {
         //gather enviroment data
         getVisionVals();
         Debug.DrawRay(visionPos, visionVector.normalized * sightRange, Color.red);
+        sightLineObj.transform.localScale = new Vector3(sightLineObj.transform.localScale.x,
+                                                sightLineObj.transform.localScale.y,
+                                                sightRange);
+
         BaseClassUpdate();
 
         Awareness();
