@@ -99,6 +99,9 @@ public class SmallSwarm : MonoBehaviour {
 	}
 
 	public void OnTriggerEnter(Collider other) {
+		if (target != null) {
+			return;
+		}
 		if (other.tag == "RoomCamera") {
 			Main.S.ShowInteractPopup(other.gameObject, "Press E to disable camera");
 		}
@@ -114,6 +117,9 @@ public class SmallSwarm : MonoBehaviour {
 	}
 
 	public void OnTriggerExit(Collider other) {
+		if (target != null) {
+			return;
+		}
 		if (other.tag == "RoomCamera" || other.tag == "RoomLight" || other.tag == "KeypadTrigger" || other.gameObject.layer == enemyLayer) {
 			Main.S.HideInteractPopup(other.gameObject);
 
