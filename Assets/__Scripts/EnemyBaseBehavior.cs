@@ -19,6 +19,9 @@ public class EnemyBaseBehavior : MonoBehaviour {
     public float visionPeriphal = 5f;
     public float attackingStayTime = 2f; //time the guard will stay there after seeing the player
     public LineRenderer sightLineObj;
+    public Material sightLineNormalMat;
+    public Material sightLineInteractedMat;
+    public Material sightLineAttackMat;
 
     [Header("Swarmed State Settings")]
     public float RunawayDistance = 10f;
@@ -93,6 +96,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
         //state machine logic
         if (currState == EnemyState.normal)
         {
+            sightLineObj.GetComponent<Renderer>().sharedMaterial = sightLineNormalMat;
             if (patrolPath.Length > 0)
             {
                 Patrol(patrolPath);
@@ -115,6 +119,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
             }
         } else if(currState == EnemyState.attacking)
         {
+            sightLineObj.GetComponent<Renderer>().sharedMaterial = sightLineAttackMat;
             navagn.Stop();
             navagn.updateRotation = false;
             Attack();
@@ -124,6 +129,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
             }
         } else if(currState == EnemyState.swarmed)
         {
+            sightLineObj.GetComponent<Renderer>().sharedMaterial = sightLineInteractedMat;
             Patrol(patrolPath);
             if (currTarget != AttackTarget.none)
             {
@@ -134,6 +140,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
             }
         } else if(currState == EnemyState.investigate)
         {
+            sightLineObj.GetComponent<Renderer>().sharedMaterial = sightLineInteractedMat;
             if (currTarget != AttackTarget.none)
             {
                 currState = EnemyState.attacking;
