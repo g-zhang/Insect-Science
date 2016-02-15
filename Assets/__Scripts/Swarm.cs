@@ -96,8 +96,9 @@ public class Swarm : MonoBehaviour {
     }
 
     void SpawnSubSwarm() {
-        // If there's already a small swarm or no charges, ignore
-        if (!Main.S.controlScientist || (charges <= 0) ) return;
+		print("SpawnSubSwarm");
+		// If there's already a small swarm or no charges, ignore
+		if (!Main.S.controlScientist || (charges <= 0) ) return;
         // No longer controlling scientist
         Main.S.controlScientist = false;
         // Deduct a charge and begin regeneration (if it hasn't already been invoked)

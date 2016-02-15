@@ -16,7 +16,7 @@ public class Scientist : MonoBehaviour {
 		S = this;
         currHP = MaxHP;
 	}
-
+	
     void Update()
     {
         if(currHP <= 0)
@@ -63,6 +63,12 @@ public class Scientist : MonoBehaviour {
 	bool wasControllingScientist;
 	void OnTriggerStay(Collider other) {
 		if (wasControllingScientist != Main.S.controlScientist) {
+			var door = other.GetComponentInParent<HallDoor>();
+			var elevator = other.GetComponent<ElevatorTrigger>();
+			if (door == null && elevator == null && other.tag != "EndZone") {
+				return;
+			}
+
 			if (Main.S.controlScientist) {
 				TryShowPopup(other.gameObject);
 			}
@@ -76,7 +82,7 @@ public class Scientist : MonoBehaviour {
 		}
 		if (Main.S.interact) {
 			var door = other.GetComponentInParent<HallDoor>();
-				if (door != null && !usedDoor) {
+			if (door != null && !usedDoor) {
 				var diff = transform.position - other.transform.position;
 				var swarmDiff = Swarm.S.transform.position - transform.position;
 				transform.position = diff + door.linkedDoor.transform.position + new Vector3(0f, 0.1f, 0f);
@@ -85,7 +91,7 @@ public class Scientist : MonoBehaviour {
 			}
 
 			var elevator = other.GetComponent<ElevatorTrigger>();
-				if (elevator != null && !usedDoor) {
+			if (elevator != null && !usedDoor) {
 				Vector3 sciPos = transform.position;
 				Vector3 swarmPos = Swarm.S.transform.position;
 				sciPos.y = elevator.destination.transform.position.y + 0.1f;
