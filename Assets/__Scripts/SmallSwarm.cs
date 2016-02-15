@@ -113,7 +113,7 @@ public class SmallSwarm : MonoBehaviour {
 			Main.S.ShowInteractPopup(other.gameObject, "Press E to short-circuit the keypad");
 		}
 		else if (other.gameObject.layer == enemyLayer) {
-			Main.S.ShowInteractPopup(other.gameObject, "Press E to swarm guard");
+			Main.S.ShowInteractPopup(other.gameObject, "Press E to make guard run forward");
 		}
 	}
 
