@@ -146,6 +146,10 @@ public class SmallSwarm : MonoBehaviour {
 		else if (other.layer == enemyLayer) {
 			other.GetComponent<EnemyBaseBehavior>().swarmed = true;
 		}
+		else if (other.tag == "KeypadTrigger") {
+			other.GetComponent<KeypadTrigger>().active = false;
+			GetComponent<Renderer>().enabled = false;
+		}
 		else {
             target = null;
             return;
@@ -181,6 +185,9 @@ public class SmallSwarm : MonoBehaviour {
 				}
 				else if (target.layer == enemyLayer) {
 					target.GetComponent<EnemyBaseBehavior>().swarmed = false;
+				}
+				else if (target.tag == "KeypadTrigger") {
+					target.GetComponent<KeypadTrigger>().active = true;
 				}
 				Main.S.HideInteractPopup(target);
 
