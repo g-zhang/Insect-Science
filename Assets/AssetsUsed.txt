@@ -1,0 +1,9 @@
+Retro Computer by OneProgrammer
+https://www.assetstore.unity3d.com/en/#!/content/49919
+
+Tables, chairs, window, and projector from Props for the Classroom by VR
+https://www.assetstore.unity3d.com/en/#!/content/5977 
+
+Character model is 'Ethan' from Standard Assets by Unity Technologies
+Camera modified from MultipurposeCameraRig from Standard Assets
+https://www.assetstore.unity3d.com/en/#!/content/32351
