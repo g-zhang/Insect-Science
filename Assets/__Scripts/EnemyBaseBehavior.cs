@@ -78,15 +78,32 @@ public class EnemyBaseBehavior : MonoBehaviour {
             SetNext(patrolPath[patrolIndex]);
         }
     }
+
+    void DrawSightLine()
+    {
+        float distance = sightRange;
+        Ray visionray = new Ray(visionPos, visionVector);
+        RaycastHit hit;
+        if (Physics.Raycast(visionray, out hit, sightRange, sightLayerMask, QueryTriggerInteraction.Ignore))
+        {
+            float tdistance = Vector3.Distance(hit.point, visionPos);
+            if(tdistance < sightRange)
+            {
+                distance = tdistance; 
+            }
+        }
+
+        sightLineObj.transform.localScale = new Vector3(sightLineObj.transform.localScale.x,
+                                        sightLineObj.transform.localScale.y,
+                                        distance);
+    }
 	
 	// Update is called once per frame
 	void Update () {
         //gather enviroment data
         getVisionVals();
         Debug.DrawRay(visionPos, visionVector.normalized * sightRange, Color.red);
-        sightLineObj.transform.localScale = new Vector3(sightLineObj.transform.localScale.x,
-                                                sightLineObj.transform.localScale.y,
-                                                sightRange);
+        DrawSightLine();
 
         BaseClassUpdate();
 
