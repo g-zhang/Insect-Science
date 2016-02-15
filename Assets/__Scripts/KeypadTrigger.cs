@@ -4,21 +4,15 @@ using System.Collections;
 public class KeypadTrigger : MonoBehaviour {
 
     public float duration = 10f;
-    public bool active = true;
 
-
-
-    void OnTriggerStay(Collider other) {
-        if(other.gameObject.tag == "SmallSwarm")
-        {
-            if (Main.S.interact && active) {
-                DeactivateDoor();
-                Destroy(other.gameObject);
-                Main.S.HideInteractPopup(this.gameObject);
-                Invoke("ActivateDoor", duration);
-            }       
-        }
-    }
+	bool _active = true;
+    public bool active {
+		get { return _active; }
+		set {
+			_active = value;
+			transform.parent.gameObject.SetActive(value);
+		}
+	}
  
     void DeactivateDoor() {
         transform.parent.gameObject.SetActive(false);

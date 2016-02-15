@@ -4,11 +4,11 @@ using UnityEngine.SceneManagement;
 
 public class LevelSelect : MonoBehaviour {
 	public void StartTutorial1() {
-		SceneManager.LoadScene("Gordon_Tutorial_Level");
+		SceneManager.LoadScene("Scene_Prototype");
 	}
 
 	public void StartTutorial2() {
-		SceneManager.LoadScene("Robbie_Tutorial_Level");
+		SceneManager.LoadScene("Scene_Tutorial_VentsKeypad");
 	}
 
 	public void StartLevel1() {
@@ -16,6 +16,6 @@ public class LevelSelect : MonoBehaviour {
 	}
 	
 	public void StartLevel2() {
-
+		SceneManager.LoadScene("Robbie_Tutorial_Level");
 	}
 }

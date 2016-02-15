@@ -99,6 +99,9 @@ public class SmallSwarm : MonoBehaviour {
 	}
 
 	public void OnTriggerEnter(Collider other) {
+		if (target != null) {
+			return;
+		}
 		if (other.tag == "RoomCamera") {
 			Main.S.ShowInteractPopup(other.gameObject, "Press E to disable camera");
 		}
@@ -114,6 +117,9 @@ public class SmallSwarm : MonoBehaviour {
 	}
 
 	public void OnTriggerExit(Collider other) {
+		if (target != null) {
+			return;
+		}
 		if (other.tag == "RoomCamera" || other.tag == "RoomLight" || other.tag == "KeypadTrigger" || other.gameObject.layer == enemyLayer) {
 			Main.S.HideInteractPopup(other.gameObject);
 
@@ -140,8 +146,13 @@ public class SmallSwarm : MonoBehaviour {
 		else if (other.layer == enemyLayer) {
 			other.GetComponent<EnemyBaseBehavior>().swarmed = true;
 		}
+		else if (other.tag == "KeypadTrigger") {
+			other.GetComponent<KeypadTrigger>().active = false;
+			GetComponent<Renderer>().enabled = false;
+		}
 		else {
-			target = null;
+            target = null;
+            return;
 		}
 
 		// If we did interact, then set our parent and start our death timer.
@@ -149,10 +160,10 @@ public class SmallSwarm : MonoBehaviour {
 			InvokeRepeating("UpdateDisabledTimer", 0f, 1f);
 			targetOffset = transform.position - target.transform.position;
 		}
-		else {
-			OnTriggerExit(other.GetComponent<Collider>());
-			Destroy(gameObject);
-		}
+        else
+        {
+            Debug.Assert(false);
+        }
 
 		// Camera control goes back to the scientist
 		GameObject.Find("MultipurposeCameraRig").GetComponent<AutoCam>().m_Target = scientistTrans;
@@ -174,6 +185,9 @@ public class SmallSwarm : MonoBehaviour {
 				}
 				else if (target.layer == enemyLayer) {
 					target.GetComponent<EnemyBaseBehavior>().swarmed = false;
+				}
+				else if (target.tag == "KeypadTrigger") {
+					target.GetComponent<KeypadTrigger>().active = true;
 				}
 				Main.S.HideInteractPopup(target);
 
