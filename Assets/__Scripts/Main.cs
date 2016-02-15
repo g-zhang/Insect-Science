@@ -110,6 +110,10 @@ public class Main : MonoBehaviour {
 	}
 
 	void Update() {
+		if (Input.GetKeyDown(KeyCode.Escape)) {
+			FadeOutAndExit("Level_Select");
+		}
+
 		if (fadeState != FadeState.None) {
 			const float fadeDuration = 0.5f;
 
