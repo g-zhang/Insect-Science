@@ -81,13 +81,18 @@ public class EnemyBaseBehavior : MonoBehaviour {
 
     void DrawSightLine()
     {
-        float distance = sightRange;
+        float mult = 1f;
+        if (EnableLight && !Light.GetComponent<RoomLight>().turnedOn)
+        {
+            mult = sightDampen;
+        }
+        float distance = sightRange * mult;
         Ray visionray = new Ray(visionPos, visionVector);
         RaycastHit hit;
         if (Physics.Raycast(visionray, out hit, sightRange, sightLayerMask, QueryTriggerInteraction.Ignore))
         {
             float tdistance = Vector3.Distance(hit.point, visionPos);
-            if(tdistance < sightRange)
+            if(tdistance < distance)
             {
                 distance = tdistance; 
             }
@@ -102,7 +107,7 @@ public class EnemyBaseBehavior : MonoBehaviour {
 	void Update () {
         //gather enviroment data
         getVisionVals();
-        Debug.DrawRay(visionPos, visionVector.normalized * sightRange, Color.red);
+        //Debug.DrawRay(visionPos, visionVector.normalized * sightRange, Color.red);
         DrawSightLine();
 
         BaseClassUpdate();
