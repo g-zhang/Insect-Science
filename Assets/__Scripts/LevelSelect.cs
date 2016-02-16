@@ -16,16 +16,16 @@ public class LevelSelect : MonoBehaviour {
 	}
 
 	public void StartLevel2() {
-		SceneManager.LoadScene("Gordon_Tutorial_Level 1");
+        SceneManager.LoadScene("Scene_Rob");
 	}
 	
 	public void StartLevel3() {
-		SceneManager.LoadScene("Scene_Nick");
+        SceneManager.LoadScene("Gordon_Tutorial_Level 1");
 	}
 
 	public void StartLevel4() {
-		SceneManager.LoadScene("Scene_Rob");
-	}
+        SceneManager.LoadScene("Scene_Nick");
+    }
 
 	public void StartLevel5() {
 		SceneManager.LoadScene("Scene_Nick_2");
