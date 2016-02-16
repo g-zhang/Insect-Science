@@ -17,9 +17,10 @@ public class Swarm : MonoBehaviour {
 
     // Variables set in the Inspector
     public GameObject       smallSwarmPrefab;               // Prefab for the small swarm
+    public GameObject       flyPrefab;                      // Prefab for the flies
     public float            moveSpeed = 2f;                 // Movement speed of the small swarms 
     public float            maxDistFromScientist = 10f;     // Maximum distance the small swarm can move from the scientist
-    public float            swarmRegenerationRate = 30f;    // How fast swarm charges are regenerated (in seconds)
+    public float            swarmRegenerationRate = 15f;    // How fast swarm charges are regenerated (in seconds)
     public float            enemyDistractionTime = 10f;     // Number of the seconds in which the small swarms distract enemies
     public bool ________________;
     // Dynamic variables
@@ -49,6 +50,11 @@ public class Swarm : MonoBehaviour {
 	void Start() {
 		// Don't want the scientist and swarm colliding
 		Physics.IgnoreCollision(sc, Scientist.S.GetComponent<CapsuleCollider>());
+
+        // Create flies
+        for (int i = 0; i < maxCharges; i++) {
+            InstantiateFlies(this.transform);
+        }
 	}
 
     void Update() {
@@ -123,7 +129,8 @@ public class Swarm : MonoBehaviour {
         GameObject go = Instantiate<GameObject>(smallSwarmPrefab);
         go.transform.localScale = (1f / (float)maxCharges) * maxSwarmScale;
         go.transform.position = transform.position;
-        // TODO: tuning adjustments
+
+        InstantiateFlies(go.transform);
 
         // Camera now follows the sub swarm
         GameObject.Find("MultipurposeCameraRig").GetComponent<AutoCam>().m_Target = go.transform;
@@ -140,4 +147,27 @@ public class Swarm : MonoBehaviour {
 			}
 		}
 	}
+
+    public void InstantiateFlies(Transform parent) {
+        float radius;
+
+        // Settings based on big swarm or small swarm
+        if (parent.name == "SmallSwarmPrefab(Clone)") {
+            radius = (1f / (float)maxCharges) * 0.8f;
+        }
+        else if (parent.name == "Swarm") {
+            radius = ((float)charges / (float)maxCharges) * 0.8f;
+        }
+        else {
+            print("error: Undefined parent name in InstantiateFlies(transform");
+            return;
+        }
+
+        for (int i = 0; i < 20; i++) {
+            GameObject go = Instantiate<GameObject>(flyPrefab);
+            go.layer = LayerMask.NameToLayer("Fly");
+            go.transform.parent = parent;
+            go.transform.position = parent.position + Random.insideUnitSphere * radius;
+        }
+    }
 }

@@ -44,8 +44,8 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			m_OrigGroundCheckDistance = m_GroundCheckDistance;
 
             // Get the swarm layer, and then invert it so it gets the layer mask
-            // of all layers except the swarm layer
-            allInteractableLayers = ~(LayerMask.GetMask("Swarm") | LayerMask.GetMask("SmallSwarm"));
+            // of all layers except the layers involving the swarms
+            allInteractableLayers = ~(LayerMask.GetMask("Swarm") | LayerMask.GetMask("SmallSwarm") | LayerMask.GetMask("Fly"));
         }
 
 		public void Move(Vector3 move, bool crouch, bool jump)
